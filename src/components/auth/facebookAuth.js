@@ -1,10 +1,10 @@
 import firebase from '../../firebase'
 
-var provider = new firebase.auth.FacebookAuthProvider();
-provider.addScope('email');
+var facebookProvider = new firebase.auth.FacebookAuthProvider();
+facebookProvider.addScope('email');
 firebase.auth().useDeviceLanguage();
-provider.setCustomParameters({
+facebookProvider.setCustomParameters({
     'display': 'popup'
 });
 
-export default provider;
+export default facebookProvider;

@@ -3,107 +3,78 @@ import {Link} from 'react-router-dom'
 import {Grid,Icon,Header,Segment, Form, Button,Message, Input, Select} from 'semantic-ui-react'
 import firebase from '../../firebase'
 import facebookProvider from './facebookAuth'
-import md5 from 'md5'
 
 
-class Register extends React.Component{
+class Login extends React.Component{
 
     state={
         email: '',
         password:'',
         errors: [],
         isLoading: false, 
-        userRef: firebase.database().ref('users'),
-
-        
+        user: {}
 
 
     }
 
-    // componentDidMount(){
-    //     firebase.auth().signOut().then(function() {
-    //         // Sign-out successful.
-    //       }).catch(function(error) {
-    //         // An error happened.
-    //       });
-    // }
+
 
     handleChange = event =>{
         this.setState({[event.target.name]: event.target.value})
-        this.isFormValid();    
+        this.setState({errors: []})  
     }
 
     handleSubmit = event =>{
         event.preventDefault();
-       if(this.isFormValid()){
+       if(!this.isFormValid(this.state)){
         this.setState({isLoading: true})
-        firebase.auth().createUserWithEmailAndPassword(this.state.email, this.state.password)
-        .then((createUser) => {
-            
-            createUser.user.updateProfile({
-                displayName: this.state.email.split(/[@*]/)[0],
-                photoURL: 'https://www.gravatar.com/avatar/'+md5(this.state.email)+'?d=identicon'
-            }).then(() =>{
-                this.saveUser(createUser).then(()=>{
-                    console.log('usersaved')
-                })
-            })
-
+        firebase
+        .auth()
+        .signInWithEmailAndPassword(this.state.email, this.state.password)
+        .then(() => {
             this.setState({isLoading: false})
+            this.setState({errors: []})
+            console.log('sig in')
         })
         
         .catch(err =>{
-            console.log(err)
             this.setState({errors: this.state.errors.concat(err) ,isLoading: false})
         })
        }
     }
 
-    saveUser = createdUser =>{
-        return this.state.userRef.child(createdUser.user.uid).set({
-            name: createdUser.user.displayName,
-            avatar: createdUser.user.photoURL,
-            gender: 'Male',
-            phoneNumber: '',
 
-        })
-    }
-
-    isPasswordValid = ({password}) =>{
-        if(password.length < 5 ){
-            return false;
-        }else{
-            return true;
-        }
-    }
-
-
-    isFormEmpty = ({email,password}) =>{
+    isFormValid = ({email,password}) =>{
         return !email.length || !password.length
     }
 
-
-    isFormValid = () =>{
-        let error;
-        let errors= [];
-
-        if(this.isFormEmpty(this.state)){
-            return false;
-        }else if(!this.isPasswordValid(this.state)){
-            error = {message: 'Password should be at least 6 characters'};
-            this.setState({errors: errors.concat(error)});
-            return false;
-        }else{
-            this.setState({errors: []});
-            return true;
-        }
-    }
     
     displayError = (errors, inputName) => {
         let haveErrorMessage;
         errors.some(error => error.message.toLowerCase().includes(inputName) ? haveErrorMessage={content: error.message, pointing: 'below'} : haveErrorMessage=false)
         return haveErrorMessage;
     }
+
+    facebooklogin = event =>{
+        event.preventDefault();
+        firebase.auth().signInWithPopup(facebookProvider).then(function(result) {
+            // This gives you a Facebook Access Token. You can use it to access the Facebook API.
+            var token = result.credential.accessToken;
+            // The signed-in user info.
+            var user = result.user;
+            // ...
+          }).catch(function(error) {
+            // Handle Errors here.
+            var errorCode = error.code;
+            var errorMessage = error.message;
+            // The email of the user's account used.
+            var email = error.email;
+            // The firebase.auth.AuthCredential type that was used.
+            var credential = error.credential;
+            // ...
+          });
+    }
+
     render(){
         const {email, password, errors, isLoading,user} = this.state;
         return(
@@ -111,7 +82,7 @@ class Register extends React.Component{
             <Grid verticalAlign="middle" textAlign="center" className='register'>
                 <Grid.Column style={{maxWidth: 480}}>
                     <Header color='teal' textAlign='center' as='h1' style={{padding: '2em'}}>
-                        Register for CStudy
+                        Sign in to CStudy
                     </Header>
                     <Form size='large' onSubmit={this.handleSubmit} >
                         <Segment stacked>
@@ -150,9 +121,9 @@ class Register extends React.Component{
                                 Submit
                             </Button>
                             <Message>
-                                You have an account ? <Link to='/Login'>Login</Link>
+                                You don't have an account ? <Link to='/register'>Register</Link>
                             </Message>
-                            <p>or Sign up with</p>
+                            <p>or Sign in with</p>
                             <Button.Group widths='2'>
                                 <Button color='facebook' size='large' onClick={this.facebooklogin}>
                                 <Icon name='facebook' />
@@ -175,4 +146,4 @@ class Register extends React.Component{
 
 }
 
-export default Register
+export default Login;
