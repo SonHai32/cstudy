@@ -3,6 +3,7 @@ import {Link} from 'react-router-dom'
 import {Grid,Icon,Header,Segment, Form, Button,Message} from 'semantic-ui-react'
 import firebase from '../../firebase'
 import facebookProvider from './facebookAuth'
+import gitProvider from './gitAuth'
 
 
 class Login extends React.Component{
@@ -72,6 +73,32 @@ class Login extends React.Component{
             // Handle Errors here.
             console.log(error)
    
+          });
+    }
+
+    gitLogin = event =>{
+        event.preventDefault();
+        firebase.auth().signInWithPopup(gitProvider).then(function(result) {
+            // This gives you a GitHub Access Token.
+            var token = result.credential.accessToken;
+            // The signed-in user info.
+            var user = result.user;
+            console.log(user)
+          }).catch(function(error) {
+            // Handle Errors here.
+            console.log(error)
+            var errorCode = error.code;
+            var errorMessage = error.message;
+            // The email of the user's account used.
+            var email = error.email;
+            // The firebase.auth.AuthCredential type that was used.
+            var credential = error.credential;
+            if (errorCode === 'auth/account-exists-with-different-credential') {
+              alert('You have signed up with a different provider for that email.');
+              // Handle linking here if your app allows it.
+            } else {
+              console.error(error);
+            }
           });
     }
 
@@ -154,7 +181,7 @@ class Login extends React.Component{
                                 Facebook
                                 </Button>
 
-                                <Button color='black' size='large'>
+                                <Button color='black' size='large' onClick={this.gitLogin}>
                                     <Icon name='github' />
                                     Github
                                 </Button>
