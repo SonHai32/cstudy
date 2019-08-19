@@ -1,6 +1,6 @@
 import React from 'react'
 import {Link} from 'react-router-dom'
-import {Grid,Icon,Header,Segment, Form, Button,Message, Input, Select} from 'semantic-ui-react'
+import {Grid,Icon,Header,Segment, Form, Button,Message} from 'semantic-ui-react'
 import firebase from '../../firebase'
 import facebookProvider from './facebookAuth'
 
@@ -12,7 +12,7 @@ class Login extends React.Component{
         password:'',
         errors: [],
         isLoading: false, 
-        user: {}
+        userRef: firebase.database().ref('users')
 
 
     }
@@ -35,6 +35,7 @@ class Login extends React.Component{
             this.setState({isLoading: false})
             this.setState({errors: []})
             console.log('sig in')
+        
         })
         
         .catch(err =>{
@@ -55,34 +56,57 @@ class Login extends React.Component{
         return haveErrorMessage;
     }
 
-    facebooklogin = event =>{
+    facebookLogin = event =>{
         event.preventDefault();
-        firebase.auth().signInWithPopup(facebookProvider).then(function(result) {
+        firebase.auth().signInWithPopup(facebookProvider).then( (result) => {
             // This gives you a Facebook Access Token. You can use it to access the Facebook API.
-            var token = result.credential.accessToken;
-            // The signed-in user info.
-            var user = result.user;
-            // ...
-          }).catch(function(error) {
+            // var token = result.credential.accessToken;
+            // // The signed-in user info.
+            // var user = result.user;
+      
+            this.saveUserFacebook(result.user)
+            
+         
+          })
+          .catch(function(error) {
             // Handle Errors here.
-            var errorCode = error.code;
-            var errorMessage = error.message;
-            // The email of the user's account used.
-            var email = error.email;
-            // The firebase.auth.AuthCredential type that was used.
-            var credential = error.credential;
-            // ...
+            console.log(error)
+   
           });
     }
 
+    saveUserFacebook = user =>{
+
+        let userId = user.uid;
+        let userExisted = ''
+        this.state.userRef.orderByKey().equalTo(userId).on('child_added', snap  =>{
+            userExisted = snap.key;
+        });
+
+        if(userId !== userExisted){
+            //if user has existed => Save user to database
+
+            this.state.userRef.child(userId).set({
+                name: user.displayName,
+                avatar: user.photoURL,
+                gender: 'Male',
+                phoneNumber: user.phoneNumber,
+            })
+             
+        }
+        // else Dont save data
+
+    }
+
     render(){
-        const {email, password, errors, isLoading,user} = this.state;
+        const {email, password, errors, isLoading} = this.state;
         return(
-        
+            
             <Grid verticalAlign="middle" textAlign="center" className='register'>
                 <Grid.Column style={{maxWidth: 480}}>
                     <Header color='teal' textAlign='center' as='h1' style={{padding: '2em'}}>
                         Sign in to CStudy
+                     
                     </Header>
                     <Form size='large' onSubmit={this.handleSubmit} >
                         <Segment stacked>
@@ -125,7 +149,7 @@ class Login extends React.Component{
                             </Message>
                             <p>or Sign in with</p>
                             <Button.Group widths='2'>
-                                <Button color='facebook' size='large' onClick={this.facebooklogin}>
+                                <Button color='facebook' size='large' onClick={this.facebookLogin}>
                                 <Icon name='facebook' />
                                 Facebook
                                 </Button>

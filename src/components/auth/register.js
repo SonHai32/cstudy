@@ -1,8 +1,7 @@
 import React from 'react'
 import {Link} from 'react-router-dom'
-import {Grid,Icon,Header,Segment, Form, Button,Message, Input, Select} from 'semantic-ui-react'
+import {Grid,Header,Segment, Form, Button,Message} from 'semantic-ui-react'
 import firebase from '../../firebase'
-import facebookProvider from './facebookAuth'
 import md5 from 'md5'
 
 
@@ -20,14 +19,6 @@ class Register extends React.Component{
 
     }
 
-    // componentDidMount(){
-    //     firebase.auth().signOut().then(function() {
-    //         // Sign-out successful.
-    //       }).catch(function(error) {
-    //         // An error happened.
-    //       });
-    // }
-
     handleChange = event =>{
         this.setState({[event.target.name]: event.target.value})
         this.isFormValid();    
@@ -41,7 +32,7 @@ class Register extends React.Component{
         .then((createUser) => {
             
             createUser.user.updateProfile({
-                displayName: this.state.email.split(/[@*]/)[0],
+                displayName: this.state.email.split(/[@]/)[0],
                 photoURL: 'https://www.gravatar.com/avatar/'+md5(this.state.email)+'?d=identicon'
             }).then(() =>{
                 this.saveUser(createUser).then(()=>{
@@ -105,7 +96,7 @@ class Register extends React.Component{
         return haveErrorMessage;
     }
     render(){
-        const {email, password, errors, isLoading,user} = this.state;
+        const {email, password, errors, isLoading} = this.state;
         return(
         
             <Grid verticalAlign="middle" textAlign="center" className='register'>
@@ -152,18 +143,6 @@ class Register extends React.Component{
                             <Message>
                                 You have an account ? <Link to='/Login'>Login</Link>
                             </Message>
-                            <p>or Sign up with</p>
-                            <Button.Group widths='2'>
-                                <Button color='facebook' size='large' onClick={this.facebooklogin}>
-                                <Icon name='facebook' />
-                                Facebook
-                                </Button>
-
-                                <Button color='black' size='large'>
-                                    <Icon name='github' />
-                                    Github
-                                </Button>
-                            </Button.Group>
                         </Segment> 
                     </Form>
                     
