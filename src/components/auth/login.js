@@ -60,10 +60,6 @@ class Login extends React.Component{
     facebookLogin = event =>{
         event.preventDefault();
         firebase.auth().signInWithPopup(facebookProvider).then( (result) => {
-            // This gives you a Facebook Access Token. You can use it to access the Facebook API.
-            // var token = result.credential.accessToken;
-            // // The signed-in user info.
-            // var user = result.user;
       
             this.saveUserFacebook(result.user)
             
@@ -78,12 +74,12 @@ class Login extends React.Component{
 
     gitLogin = event =>{
         event.preventDefault();
-        firebase.auth().signInWithPopup(gitProvider).then(function(result) {
+        firebase.auth().signInWithPopup(gitProvider).then( (result) => {
             // This gives you a GitHub Access Token.
             var token = result.credential.accessToken;
             // The signed-in user info.
             var user = result.user;
-            console.log(user)
+            this.saveUserGit(result.user);
           }).catch(function(error) {
             // Handle Errors here.
             console.log(error)
@@ -115,6 +111,29 @@ class Login extends React.Component{
 
             this.state.userRef.child(userId).set({
                 name: user.displayName,
+                avatar: user.photoURL,
+                gender: 'Male',
+                phoneNumber: user.phoneNumber,
+            })
+             
+        }
+        // else Dont save data
+
+    }
+
+    saveUserGit = user =>{
+
+        let userId = user.uid;
+        let userExisted = ''
+        this.state.userRef.orderByKey().equalTo(userId).on('child_added', snap  =>{
+            userExisted = snap.key;
+        });
+
+        if(userId !== userExisted){
+            //if user has existed => Save user to database
+
+            this.state.userRef.child(userId).set({
+                name: user.email.split(/[@]/)[0],
                 avatar: user.photoURL,
                 gender: 'Male',
                 phoneNumber: user.phoneNumber,
