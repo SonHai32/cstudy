@@ -1,6 +1,6 @@
 import React from 'react'
 import {Link} from 'react-router-dom'
-import {Grid,Icon,Header,Segment, Form, Button,Message} from 'semantic-ui-react'
+import {Grid,Icon,Header,Segment, Form, Button,Message,Portal} from 'semantic-ui-react'
 import firebase from '../../firebase'
 import facebookProvider from './facebookAuth'
 import gitProvider from './gitAuth'
@@ -13,7 +13,8 @@ class Login extends React.Component{
         password:'',
         errors: [],
         isLoading: false, 
-        userRef: firebase.database().ref('users')
+        userRef: firebase.database().ref('users'),
+        openPotal: false
 
 
     }
@@ -40,7 +41,9 @@ class Login extends React.Component{
         })
         
         .catch(err =>{
-            this.setState({errors: this.state.errors.concat(err) ,isLoading: false})
+            
+            this.setState({errors: this.state.errors.concat(err), openPotal: true})
+            
         })
        }
     }
@@ -55,6 +58,7 @@ class Login extends React.Component{
         let haveErrorMessage;
         errors.some(error => error.message.toLowerCase().includes(inputName) ? haveErrorMessage={content: error.message, pointing: 'below'} : haveErrorMessage=false)
         return haveErrorMessage;
+        
     }
 
     facebookLogin = event =>{
@@ -65,11 +69,34 @@ class Login extends React.Component{
             
          
           })
-          .catch(function(error) {
-            // Handle Errors here.
-            console.log(error)
-   
-          });
+          .catch(err =>{
+              console.log(err);
+            //   this.displayAuthError(err)
+              this.setState({errors: this.state.errors.concat(err), openPotal:true})
+
+                
+          })
+    }
+
+    // displayAuthError = error =>(
+    //     <TransitionablePortal  
+    //                 open
+    //                 className='display__err'
+    //             >
+    //                 <Segment>
+    //                     <Header as='h3'> Open Portal</Header>
+    //                 </Segment>
+    
+    //             </TransitionablePortal>
+    // )
+    
+
+    displayAuthError = error =>{
+        if(error.length > 0){
+            return true;
+        }else{
+            return false;
+        }
     }
 
     gitLogin = event =>{
@@ -136,15 +163,34 @@ class Login extends React.Component{
     }
 
     render(){
-        const {email, password, errors, isLoading} = this.state;
+        const {email, password, errors, isLoading,openPotal} = this.state;
+        const open = this.displayAuthError(errors);
         return(
             
             <Grid verticalAlign="middle" textAlign="center" className='register'>
+                 <Portal  
+                closeOnDocumentClick
+                   open={openPotal}
+                   transition='drop'
+                   
+                >
+                    
+                    <Segment fluid style={{position: 'absolute', left:'50%', top: '50%', transform:'translate(-50%, -50%)' ,width: '480px',height: '200px'}}>
+                        <Header as='h3' color='red'>Login error</Header>
+                        <Header as='h4' textAlign='center' color='black'>{errors.map(err => err.message)}</Header>
+                        <Button style={{marginLeft: '5px'}} color='red' textAlign='center' onClick={this.facebookLogin}>
+                            <Icon name='redo' />
+                            Try Again
+                        </Button>
+                    </Segment>
+    
+                </Portal>
                 <Grid.Column style={{maxWidth: 480}}>
                     <Header color='teal' textAlign='center' as='h1' style={{padding: '2em'}}>
                         Sign in to CStudy
                      
                     </Header>
+                    
                     <Form size='large' onSubmit={this.handleSubmit} >
                         <Segment stacked>
                             <Form.Input
@@ -200,6 +246,7 @@ class Login extends React.Component{
                     </Form>
                     
                 </Grid.Column>
+               
                 
             </Grid>
         )
