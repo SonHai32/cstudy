@@ -1,7 +1,8 @@
 import React from 'react'
-import {Header, Grid, Image, Dropdown, Icon} from 'semantic-ui-react'
+import {Header, Grid, Image, Dropdown, Icon, Menu, Label, Button} from 'semantic-ui-react'
 import {connect} from 'react-redux'
 import firebase from '../../firebase'
+import { isAbsolute } from 'path';
 
 class HeaderPanel extends React.Component{
 
@@ -27,50 +28,76 @@ class HeaderPanel extends React.Component{
        
     ]
 
+
     handleSignOut = event =>{
         event.preventDefault();
         firebase.auth().signOut();
     }
 
+
+
     render(){
         
         const {currentUser} = this.state;
+        const avatarProps ={
+            avatar: true,
+            src: currentUser.photoURL,
+            space: 'right'
+        }
        
 
         return(
-            <Grid.Row color='violet'>
-            <Grid.Column verticalAlign='middle' width={5} floated='left'>
-                <Header as='h1'> <Icon name='code' color='olive' /> CChat</Header>
-                
-            </Grid.Column>
-            {/* <Grid.Column verticalAlign='middle' width={8} >
-                column 2
-            </Grid.Column>
-             */}
-            <Grid.Column textAlign='right' floated='right' verticalAlign='middle' width={5}>  
-           
-            <Dropdown
+            <Menu fixed='top' color='black' inverted style={{height: '80px'}} >
+                <Grid columns='equal' style={{width: '100%'}}>
+                    <Grid.Column verticalAlign='middle' floated='left'  >
+                        <Header color='white' inverted> <Icon name='code' color='white' /> Chat</Header>
+                    </Grid.Column>
+                    <Grid.Column  verticalAlign='middle' textAlign='center'>
+
+                    <Label
+                        as='a'
+                        color='black'
+                        size='large'
+                        content={currentUser.displayName}
+
+                        image={avatarProps}
+                    >
+
+                    </Label>
+                    
+                    
+                 
+                    <Menu compact color='black' inverted>
+                        <Menu.Item as='a'>
+                            <Icon name='mail'/> 
+                            <Label floating color='blue' size='tiny'>
+                            0
+                            </Label>
+                        </Menu.Item>
+                        <Menu.Item as='a'>
+                            <Icon name='alarm' />
+                            <Label floating color='blue' size='tiny'>
+                                0
+                            </Label>
+                        </Menu.Item>
+                        <Menu.Item>
+                            <Dropdown 
+                                inline
+                                
+                                clearable
+                                trigger={<span></span>}
+                                options={this.dropDownOptions()}
+                            >
+
+                            </Dropdown>
+                        </Menu.Item>
+
+                    </Menu>
                 
 
-                pointing='top left'
-                inline
-                className='icon'
-                trigger={
-                    <span>
-                        <Image spaced='right' avatar src={currentUser.photoURL} />
-                        {currentUser.displayName}
-                    </span>
-                }
-                options={this.dropDownOptions()}
-            >
-                
-            </Dropdown>
-         
-            </Grid.Column>
-            
-           
-           
-            </Grid.Row>
+                    </Grid.Column>
+                </Grid>
+            </Menu>
         );
 
     }

@@ -1,9 +1,11 @@
 import React from 'react';
 import './App.css';
 import firebase from '../firebase'
-import { Button, Grid } from 'semantic-ui-react';
+import { Button, Grid, Header, Segment, Comment, Label,Image, Icon } from 'semantic-ui-react';
 import HeaderPanel from './Header/header'
-
+import SidePanelLeft from './SidePanel/SidePanelLeft'
+import SidePanelRight from './SidePanel/SidePanelRight'
+import NewsFeeds from './NewsFeeds/NewsFeeds'
 
 class App extends React.Component{
 
@@ -13,22 +15,19 @@ class App extends React.Component{
 
   render(){
     return(
-      <Grid padded >
+      <Grid>
        
             <HeaderPanel />
-      
-        <Grid.Row>
-          <Grid.Column>
-            ddd
+            <SidePanelLeft />
+            <SidePanelRight />
+       
+          <Grid.Column  style={{width: '100%' ,marginTop: '90px', marginLeft: '300px', marginRight: '800px'}}>
+            <NewsFeeds />
           </Grid.Column>
-          <Grid.Column>
-            hhh
-          </Grid.Column>
-          <Grid.Column>
-            sss
-          </Grid.Column>
-        </Grid.Row>
+    
+   
       </Grid>
+
     )
   }
 }
