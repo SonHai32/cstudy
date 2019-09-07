@@ -22,7 +22,7 @@ class NewsFeeds extends React.Component{
         return(
       
 
-            <Segment>
+    <Segment >
       
   
       <Feed size='large' >

@@ -7,7 +7,7 @@ class SidePanelRight extends React.Component{
 
         return(
             <Menu
-                style={{width: '250px', background:'#e7e7e7', top: '80px'}}
+                style={{background:'#e7e7e7', top: '80px'}}
                 fixed='right'
                 vertical
                 inverted

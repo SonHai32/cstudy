@@ -1,20 +1,43 @@
 import React from 'react'
-import { Segment, Sidebar, Divider,Menu, Header } from 'semantic-ui-react'
+import { Segment, Sidebar, Divider,Menu, Header, Button, Grid } from 'semantic-ui-react'
 
 class SidePanelLeft extends React.Component{
-    render(){
 
+    state = { activeItems: 'NewsFeed'};
+    handleItemClicked = (e ,{name}) =>{
+      this.setState({activeItems : name})
+    }
+    render(){
+        const {activeItems} = this.state;
         return(
-          <Menu
-           
-            inverted
+         
+        <Grid centered>
+          <Grid.Column textAlign='center'> 
+            <Menu   
             fixed='left'
             vertical
-            style={{width: '250px',background: '#e7e7e7', top: '80px'}}
-          >
-        tttd
+            style={{ background: '#e7e7e7', top: '80px'}}
+            color='black'
+            pointing
+            >
+            <Menu.Item 
+              name='Channels'
+              active={activeItems === 'Channels'}
+              onClick={this.handleItemClicked}
+              color='green'
+            />
+            <Menu.Item 
+              name='NewsFeed'
+            
+              active={activeItems === 'NewsFeed'}
+              onClick={this.handleItemClicked}
+              color='green'
+            />
               
           </Menu>
+          </Grid.Column>
+        </Grid>
+       
         )
 
     }
