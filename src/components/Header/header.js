@@ -25,6 +25,10 @@ class HeaderPanel extends React.Component{
             key : 'signOut',
             text: <span onClick={this.handleSignOut}><Icon name='sign out' /> Sign Out</span>
         },
+        {
+            key: 'setting',
+            text: <span><Icon name='setting'/> Settings</span>
+        }
        
     ]
 
@@ -76,6 +80,12 @@ class HeaderPanel extends React.Component{
                         </Menu.Item>
                         <Menu.Item as='a'>
                             <Icon name='alarm' />
+                            <Label floating color='blue' size='tiny'>
+                                0
+                            </Label>
+                        </Menu.Item>
+                        <Menu.Item as='a'>
+                            <Icon name='users' />
                             <Label floating color='blue' size='tiny'>
                                 0
                             </Label>

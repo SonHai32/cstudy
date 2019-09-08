@@ -1,6 +1,7 @@
 import React from 'react'
-import {Segment,Comment,Icon,Label, Feed,Image, Divider, Grid} from 'semantic-ui-react'
+import {Segment,Header,Icon,Label, Feed,Image, Divider, Grid, Form, TextArea, Menu, Button, List, Responsive} from 'semantic-ui-react'
 import { Dirent } from 'fs';
+import { placeholder } from '@babel/types';
 
 class NewsFeeds extends React.Component{
 
@@ -10,21 +11,81 @@ class NewsFeeds extends React.Component{
     }
     
     state ={
-        like: false
+        like: false,
+        user: this.props.currentUser
     }
 
     render(){
-        const {like} = this.state;
+        const {like,user} = this.state;
         const newFeed ={
 
         }
        
         return(
-      
+      <React.Fragment>
 
+    <Segment stacked>
+        <Header as='h3' block>
+        
+          <Header.Content>Create Post <Icon name='edit outline' /></Header.Content>
+         
+        </Header>
+     
+
+        <Form style={{marginTop: '5px'}}>
+         <Form.Group >
+           <Image avatar size='tiny' src={user.photoURL}/>
+           <TextArea placeholder='What do you thing ? ' onInput={()=> console.log("object")} >
+          
+          </TextArea>
+         </Form.Group>
+        
+        </Form>
+       
+      <Responsive minWidth={1800}>
+      <Button.Group fluid >
+      <Button circular  >
+              <Icon name='photo' /> Photo/Video
+            </Button>
+            <Button circular>
+              <Icon name='user plus' /> Tag Friends
+            </Button>
+         
+            <Button circular>
+              <Icon name='music' /> Music
+            </Button>
+            <Button circular>
+              <Icon name='smile outline' /> Feeling
+            </Button>
+            <Button circular>
+              <Icon name='location arrow' /> Check in
+            </Button>
+            <Button>
+              <Icon name='list' /> More
+             </Button>
+      </Button.Group>
+      </Responsive>
+      <Responsive maxWidth={1790} >
+      <Button.Group fluid >
+      <Button circular  >
+              <Icon name='photo' /> Photo/Video
+            </Button>
+            <Button circular>
+              <Icon name='user plus' /> Tag Friends
+            </Button>
+         
+            
+            <Button>
+              <Icon name='list' /> More
+             </Button>
+      </Button.Group>
+      </Responsive>
+
+         
+    </Segment>
     <Segment >
       
-  
+      
       <Feed size='large' >
     
     <Feed.Event  >
@@ -88,7 +149,7 @@ for example, to order products or services from e-commerce websites, or to parti
   </Segment>
 
       
-
+  </React.Fragment>
  
            
             

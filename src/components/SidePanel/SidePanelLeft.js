@@ -62,7 +62,8 @@ class SidePanelLeft extends React.Component{
       this.setState({[name] : value})
     }
 
-    channelCreateSubmit = () =>{
+    channelCreateSubmit = event =>{
+      event.preventDefault();
       if(this.isFormValid(this.state)){
         this.createChannel()
       }else{
@@ -97,9 +98,9 @@ class SidePanelLeft extends React.Component{
     }
 
     isFormValid = ({channelName, channelDetail}) =>{
-
       
-      if(channelName === null || channelDetail === null){
+      
+      if(channelName === '' || channelDetail === ''){
 
         this.setState({errors: this.state.errors.concat("Channel name or Channel description can't be null" )});
         return false
@@ -126,33 +127,40 @@ class SidePanelLeft extends React.Component{
             <Menu   
             fixed='left'
             vertical
-            style={{ background: '#e7e7e7', top: '80px'}}
+            style={{ background: '#e7e7e7', top: '80px', padding: '30px 0' }}
             color='black'
             pointing
             borderless
             size='huge'
+            compact
+          
           
             >
               {console.log(this.state.currentUser)}
             
             <Menu.Item 
+
               name='NewsFeed'
-            
               active={activeItems === 'NewsFeed'}
               onClick={this.handleItemClicked}
-              color='green'
-            />
+             
+            >
+              <Header as='h4'><Icon name='newspaper' />NewsFeed</Header>
+              </Menu.Item>
+          
+
             <Menu.Item 
               
               name='Channels'
               active={activeItems === 'Channels'}
               onClick={this.handleItemClicked}
               color='green'
+              style={{width: '100%'}}
             >
-              Channels
+              <Header as='h4'><Icon name='tag' />Channels</Header>
               {activeItems === 'Channels' ? 
                 
-                <List animated selection celled size='medium' style={{marginTop: '20px' , overflowY: 'scroll' ,overflowX: 'hidden', overflowY:'hidden' }}  >
+                <List animated selection  celled size='medium' style={{height: '75vh' , marginTop: '20px' ,overflowX: 'hidden' ,overflowY: 'scroll'}}  >
                   
                     
                     <Popup

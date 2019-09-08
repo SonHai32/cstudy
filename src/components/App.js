@@ -16,8 +16,8 @@ const App = ({currentUser}) =>(
     <HeaderPanel />
     <SidePanelLeft currentUser={currentUser} />
     <SidePanelRight />
-    <Grid.Column  style={{width: '100%' ,marginTop: '90px', marginLeft: '300px', marginRight: '800px'}}>
-      <NewsFeeds />
+    <Grid.Column  style={{width: '100%' ,marginTop: '90px', marginLeft: '400px', marginRight: '700px'}}>
+      <NewsFeeds currentUser={currentUser} />
     </Grid.Column>
     
    
