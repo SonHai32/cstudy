@@ -82,8 +82,8 @@ class HeaderPanel extends React.Component{
                         </Menu.Item>
                         <Menu.Item>
                             <Dropdown 
-                                inline
                                 
+                                inline
                                 clearable
                                 trigger={<span></span>}
                                 options={this.dropDownOptions()}
