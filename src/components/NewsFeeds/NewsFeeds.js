@@ -1,8 +1,10 @@
 import React from 'react'
-import {Segment,Header,Icon,Label, Feed,Image, Divider, Grid, Form, TextArea, Menu, Button, List, Responsive} from 'semantic-ui-react'
+import {Segment,Header,Icon,Label, Feed,Image, Divider, Grid, Form, TextArea, Menu, Button, List, Responsive, Modal} from 'semantic-ui-react'
 import uuid from 'uuidv4'
 import firebase from '../../firebase'
 import FileModal from './FileModal'
+import ImageModal from './ImageModal'
+import moment from 'moment'
 class NewsFeeds extends React.Component{
 
     state ={
@@ -10,11 +12,34 @@ class NewsFeeds extends React.Component{
       user: this.props.currentUser,
       post: '',
       fileModal: false,
+      imageModalStatus: false,
+      imageModalURL: '',
       uploadTask: null,
       uploadStatus : '',
       percentUploaded : 0,
+      imagePost: [],
+      postCreate: [],
+      postFromDatabase: [],
       storeRef: firebase.storage().ref(),
-      imagePost: []
+      databaseRef: firebase.database().ref('posts')
+     
+    }
+
+    componentDidMount(){
+      this.addPostListener()
+    }
+
+    addPostListener = () =>{
+
+      const ref = firebase.database().ref('posts')
+      const postLoaded = []
+      ref.on('child_added',snap =>{
+        ref.child(snap.key).on('child_added',snap => postLoaded.push(snap.val()));
+        this.setState({postFromDatabase: this.state.postFromDatabase.concat(postLoaded)})
+   
+        
+      })
+  
     }
 
 
@@ -36,6 +61,16 @@ class NewsFeeds extends React.Component{
       this.setState({fileModal: false})
     }
 
+    openImageModal = event =>{
+     
+      this.setState({imageModalStatus: true, imageModalURL: event.target.name})
+    }
+
+    closeImageModal = () =>{
+      this.setState({imageModalStatus: false, imageModalURL:''})
+
+    }
+
     uploadFile = (file, metadata) =>{
       const filePath = this.state.user.uid+'/temporaryMedia/image/'+uuid()+'.jpg'
 
@@ -48,15 +83,39 @@ class NewsFeeds extends React.Component{
             this.state.uploadTask.on('state_changed', snap =>{
               const percentUploaded = Math.round((snap.bytesTransferred / snap.totalBytes)*100)
               this.setState({percentUploaded});
-              console.log(this.state.percentUploaded);
             
-            this.state.uploadTask.snapshot.ref.getDownloadURL().then(downloadURL => {this.setState({imagePost: this.state.imagePost.concat({downloadURL: downloadURL,imagePath: this.state.uploadTask.location_.path })}) }).catch(err=>console.log(err))
+            
+            this.state.uploadTask.snapshot.ref
+            .getDownloadURL()
+            .then(downloadURL => {
+              const image = {downloadURL: downloadURL, imagePath: this.state.uploadTask.location_.path}
+              this.setState({imagePost: this.state.imagePost.concat(image)})
+            
+               })
+              .catch(err=>console.log(err))
+            
             setTimeout(()=>{this.state.imagePost.forEach(imagePost => {if(imagePost.length > 0 ) {this.deleteImageFromStorge(imagePost.imagePath)}}) ;this.setState({imagePost: []})},1200000) // if user doesn't post this will be delete in 20 minutesetTimeout(()=>{this.state.imagePost.forEach(imagePost => this.deleteImageFromStorge(imagePost.imagePath)) ;this.setState({imagePost: []})},5000) // if user doesn't post this will be delete in 20 minute
             })
           }
         )
       }
 
+      savePost = event =>{
+        event.preventDefault();
+        const postCreate ={
+          createByUid: this.state.user.uid,
+          createByName: this.state.user.displayName,
+          avatar: this.state.user.photoURL ,
+          timestamp: Date.now(),
+          postImages: Array().concat(this.state.imagePost),
+          postText: this.state.post
+        }
+        const postChild = this.state.user.uid+uuid()+'/post';
+        console.log(postCreate.postImages)
+        this.state.databaseRef.child(postChild).set(postCreate).then(()=>this.setState({post: '', imagePost: []}))
+        
+
+      }
 
       displayImagePost = ({imagePost}) =>(
         imagePost.length > 0 ? 
@@ -96,20 +155,22 @@ class NewsFeeds extends React.Component{
 
         this.setState({imagePost : newImagePost})
         
-        // this.setState({imagePost: this.state.imagePost.splice(removeIndex,removeIndex)})
+        
       }
+      
     
 
-
     render(){
-        const {user} = this.state;
-       
+        const {user,post,postFromDatabase} = this.state;
+        const postImages = [];
         return(
       <React.Fragment>
+        
         <FileModal fileModal={this.state.fileModal}
                    uploadFile = {this.uploadFile}
                    closeModal = {this.closeModal}
         />
+        
     <Segment stacked>
       
         <Header as='h3' block>
@@ -126,7 +187,7 @@ class NewsFeeds extends React.Component{
         <Form style={{marginTop: '5px'}}>
          <Form.Group >
            <Image avatar src={user.photoURL}/>
-           <TextArea placeholder='What do you thing ? ' onChange={this.handlePostChange} >
+           <TextArea placeholder='What do you thing ? ' value={post} onChange={this.handlePostChange} >
           
           </TextArea>
          </Form.Group>
@@ -172,75 +233,72 @@ class NewsFeeds extends React.Component{
              </Button>
       </Button.Group>
       </Responsive>
-      {this.state.post.length > 0 || this.state.imagePost.length >0 ? <Button  fluid style={{marginTop: '20px'}}>
+      {this.state.post.length > 0 || this.state.imagePost.length >0 ? <Button  onClick={this.savePost} fluid style={{marginTop: '20px'}}>
         Post
       </Button> : ''}
          
     </Segment>
-    <Segment >
-      
-      
-      <Feed size='large' >
     
-    <Feed.Event  >
-      <Feed.Label>   
-        <img src='https://www.gravatar.com/avatar/b4339e6c847f4f25822532330320548e?d=identicon' />
-      </Feed.Label>
-      <Feed.Content>
-        <Feed.Summary>
-          <Feed.User>Elliot Fu</Feed.User> added you as a friend
-          <Feed.Date>1 Hour Ago</Feed.Date>
-          
-        </Feed.Summary>
-        <Feed.Extra text>
-        
-        Text messaging, or texting, is the act of composing and sending electronic messages, typically consisting of alphabetic and numeric characters, between two or more users of mobile devices, desktops/laptops, or other type of compatible computer. Text messages may be sent over a cellular network, or may also be sent via an Internet connection.
-
-The term originally referred to messages sent using the Short Message Service (SMS). It has grown beyond alphanumeric text to include multimedia messages (known as MMS) containing digital images, videos, and sound content, as well as ideograms known as emoji (happy faces, sad faces, and other icons).
-
-Text messages are used for personal, family, business and social purposes. Governmental and non-governmental organizations use text messaging for communication between colleagues. In the 2010s, the sending of short informal messages has become an accepted part of many cultures, as happened earlier with emailing.[1] This makes texting a quick and easy way to communicate with friends, family and colleagues, 
-including in contexts where a call would be impolite or inappropriate (e.g., 
-calling very late at night or when one knows the other person is busy with family or work activities). 
-Like e-mail and voicemail, and unlike calls (in which the caller hopes to speak directly with the recipient), 
-texting does not require the caller and recipient to both be free at the same moment; this permits communication even between busy individuals. 
-Text messages can also be used to interact with automated systems, 
-Advertisers and service providers use direct text marketing to send messages to mobile users about promotions, payment due dates, 
- and other notifications instead of using postal mail, email, or voicemail.
- Advertisers and service providers use direct text marketing to send messages to mobile users about promotions, payment due dates, 
- and other notifications instead of using postal mail, email, or voicemail.
- and other notifications instead of using postal mail, email, or voicemail.
- and other notifications instead of using postal mail, email, or voicemail.
- and other notifications instead of using postal mail, email, or voicemail.
-       
-for example, to order products or services from e-commerce websites, or to participate in online contests.
- Advertisers and service providers use direct text marketing to send messages to mobile users about promotions, payment due dates, 
- and other notifications instead of using postal mail, email, or voicemail.
- 
- 
-        </Feed.Extra>
-        <Divider clearing />
-        <Feed.Extra text >
-          20 likes
-        </Feed.Extra>
-        <Divider clearing />
-        <Feed.Meta>
-        
-          <Feed.Like   as='a' style={{marginRight: '20px'}}>
-            <Icon size='large' name='thumbs up outline' /> Like
-          </Feed.Like>
-        
-          <Feed.Like > 
-            <Icon name='comment outline' size='large' /> Comment
-          </Feed.Like>
-         
-        </Feed.Meta>
-      </Feed.Content>
-    </Feed.Event>
-  
-      </Feed>
       
+    
+      {postFromDatabase.length > 0 ? (
+        postFromDatabase.map((value, key) =>(
+         
+          <Segment >
+         
+        
+          <Feed size='large'  >
+          
+          <Feed.Event>
+            <Feed.Label image={value.avatar} />
+            <Feed.Content >
+              <Feed.Summary user={value.createByName} date={moment(value.timestamp).fromNow()} />
+              <Feed.Extra text content={value.postText} />
+              {value.postImages.length > 0 ? (
+                value.postImages.map((value,key) =>(
+               
+                    <List horizontal  >
+                      <List.Item as='a'  key={key}>
+                        <img style={{marginLeft: '10px',width: '500px'}} src={value.downloadURL} name={value.downloadURL} onClick={this.openImageModal} />
+                        <ImageModal 
+                          imageModal={this.state.imageModalStatus} 
+                          closeModal={this.closeImageModal}
+                          imageURL={this.state.imageModalURL} />
+                      </List.Item>
+                    </List>
+                    
+                
+                ))
+              ) : ''}
+               
+             
+            </Feed.Content>
+            
+          </Feed.Event>
+          <Divider />
+          
+            <Button.Group  fluid  color='blue' >
+              <Button style={{border: 'none'}} basic  > 
+                <Icon name='thumbs up ' color='blue' inverted /> Like
+              </Button>
+              <Button style={{border: 'none'}} basic >
+                <Icon name='comment outline' /> Comment
+              </Button>
+              <Button style={{border: 'none'}} basic size='medium' >
+                <Icon name='share' /> Share 
+              </Button>
+            </Button.Group>
+      
+         
+        
+      </Feed>
+      </Segment>
+        ))
+      ) :  ''}
 
-  </Segment>
+     
+
+ 
 
       
   </React.Fragment>
