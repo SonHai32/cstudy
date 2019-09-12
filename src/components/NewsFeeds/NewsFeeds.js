@@ -1,41 +1,132 @@
 import React from 'react'
 import {Segment,Header,Icon,Label, Feed,Image, Divider, Grid, Form, TextArea, Menu, Button, List, Responsive} from 'semantic-ui-react'
-import { Dirent } from 'fs';
-import { placeholder } from '@babel/types';
-
+import uuid from 'uuidv4'
+import firebase from '../../firebase'
+import FileModal from './FileModal'
 class NewsFeeds extends React.Component{
+
+    state ={
+      like: false,
+      user: this.props.currentUser,
+      post: '',
+      fileModal: false,
+      uploadTask: null,
+      uploadStatus : '',
+      percentUploaded : 0,
+      storeRef: firebase.storage().ref(),
+      imagePost: []
+    }
+
 
     handleLikeClicked = event =>{
         event.preventDefault();
         this.setState({like: !this.state.like })
     }
     
-    state ={
-        like: false,
-        user: this.props.currentUser
+    handlePostChange = (e, { value}) =>{
+      this.setState({post: value})
+    }
+    
+    openModal = () =>{
+      this.setState({fileModal: true})
     }
 
-    render(){
-        const {like,user} = this.state;
-        const newFeed ={
+    closeModal = () =>{
 
-        }
+      this.setState({fileModal: false})
+    }
+
+    uploadFile = (file, metadata) =>{
+      const filePath = this.state.user.uid+'/temporaryMedia/image/'+uuid()+'.jpg'
+
+      this.setState({
+        uploadStatus : 'uploading',
+        uploadTask: this.state.storeRef.child(filePath).put(file,metadata)
+      
+        },
+          () => {
+            this.state.uploadTask.on('state_changed', snap =>{
+              const percentUploaded = Math.round((snap.bytesTransferred / snap.totalBytes)*100)
+              this.setState({percentUploaded});
+              console.log(this.state.percentUploaded);
+            
+            this.state.uploadTask.snapshot.ref.getDownloadURL().then(downloadURL => {this.setState({imagePost: this.state.imagePost.concat({downloadURL: downloadURL,imagePath: this.state.uploadTask.location_.path })}) }).catch(err=>console.log(err))
+            setTimeout(()=>{this.state.imagePost.forEach(imagePost => {if(imagePost.length > 0 ) {this.deleteImageFromStorge(imagePost.imagePath)}}) ;this.setState({imagePost: []})},1200000) // if user doesn't post this will be delete in 20 minutesetTimeout(()=>{this.state.imagePost.forEach(imagePost => this.deleteImageFromStorge(imagePost.imagePath)) ;this.setState({imagePost: []})},5000) // if user doesn't post this will be delete in 20 minute
+            })
+          }
+        )
+      }
+
+
+      displayImagePost = ({imagePost}) =>(
+        imagePost.length > 0 ? 
+        <Segment size='large' >
+          <List  horizontal>
+          
+              {imagePost.map((val,key) => (
+                <List.Item key={key} style={{marginRight: '15px'}}> 
+                  <Image rounded size='small' key={val.downloadURL} src={val.downloadURL} label={{as: 'a' ,name: key, corner:'right', icon:'remove',size: 'mini',color:'red',onClick: this.removeImagePost}} /> 
+                </List.Item> ) )}
+                
+            <List.Item>
+              <Icon style={{cursor: 'pointer', boder: 'solid 2px '}} color='black' inverted name='add' size='big' onClick={this.openModal} />
+            </List.Item>
+          </List>
+          
+        </Segment> : ''
+      )
+      
+      deleteImageFromStorge = imagePath =>{
+          if(imagePath){
+            this.state.storeRef.child(imagePath).delete().then(() => console.log("deleted")).catch(err=> console.log(err))
+          }
+          
+      }
+
+      removeImagePost = event =>{
+        event.preventDefault();
+        let removeIndex = event.target.name;
+        
+        this.deleteImageFromStorge(this.state.imagePost[removeIndex].imagePath)
+
+        const newImagePost = this.state.imagePost.filter((value,index,arr) =>{
+          return index != removeIndex
+        })
+        
+
+        this.setState({imagePost : newImagePost})
+        
+        // this.setState({imagePost: this.state.imagePost.splice(removeIndex,removeIndex)})
+      }
+    
+
+
+    render(){
+        const {user} = this.state;
        
         return(
       <React.Fragment>
-
+        <FileModal fileModal={this.state.fileModal}
+                   uploadFile = {this.uploadFile}
+                   closeModal = {this.closeModal}
+        />
     <Segment stacked>
+      
         <Header as='h3' block>
         
           <Header.Content>Create Post <Icon name='edit outline' /></Header.Content>
-         
+        
         </Header>
-     
+        
+          {this.displayImagePost(this.state)}
+        
+
+    
 
         <Form style={{marginTop: '5px'}}>
          <Form.Group >
-           <Image avatar size='tiny' src={user.photoURL}/>
-           <TextArea placeholder='What do you thing ? ' onInput={()=> console.log("object")} >
+           <Image avatar src={user.photoURL}/>
+           <TextArea placeholder='What do you thing ? ' onChange={this.handlePostChange} >
           
           </TextArea>
          </Form.Group>
@@ -44,7 +135,8 @@ class NewsFeeds extends React.Component{
        
       <Responsive minWidth={1800}>
       <Button.Group fluid >
-      <Button circular  >
+        
+      <Button circular onClick={this.openModal}  >
               <Icon name='photo' /> Photo/Video
             </Button>
             <Button circular>
@@ -80,7 +172,9 @@ class NewsFeeds extends React.Component{
              </Button>
       </Button.Group>
       </Responsive>
-
+      {this.state.post.length > 0 || this.state.imagePost.length >0 ? <Button  fluid style={{marginTop: '20px'}}>
+        Post
+      </Button> : ''}
          
     </Segment>
     <Segment >
