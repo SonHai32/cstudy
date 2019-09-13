@@ -1,8 +1,7 @@
 import React from 'react'
-import {Header, Grid, Image, Dropdown, Icon, Menu, Label, Button} from 'semantic-ui-react'
+import {Header, Grid, Dropdown, Icon, Menu, Label} from 'semantic-ui-react'
 import {connect} from 'react-redux'
 import firebase from '../../firebase'
-import { isAbsolute } from 'path';
 
 class HeaderPanel extends React.Component{
 
@@ -54,7 +53,7 @@ class HeaderPanel extends React.Component{
             <Menu fixed='top' color='black' inverted style={{height: '80px'}} >
                 <Grid columns='equal' style={{width: '100%'}}>
                     <Grid.Column verticalAlign='middle' floated='left'  >
-                        <Header color='white' inverted> <Icon name='code' color='white' /> Chat</Header>
+                        <Header  inverted> <Icon name='code' color='green' /> Chat</Header>
                     </Grid.Column>
                     <Grid.Column  verticalAlign='middle' textAlign='center'>
 

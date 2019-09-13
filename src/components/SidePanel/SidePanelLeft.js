@@ -1,5 +1,5 @@
 import React from 'react'
-import { Segment, Sidebar, Divider,Menu, Header, Button, Grid, List, Icon, Popup, Modal, Form } from 'semantic-ui-react'
+import { Menu, Header, Button, Grid, List, Icon, Popup, Modal, Form } from 'semantic-ui-react'
 import firebase from '../../firebase'
 
 class SidePanelLeft extends React.Component{

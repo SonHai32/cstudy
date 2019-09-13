@@ -164,7 +164,7 @@ class Login extends React.Component{
 
     render(){
         const {email, password, errors, isLoading,openPotal} = this.state;
-        const open = this.displayAuthError(errors);
+   
         return(
             
             <Grid verticalAlign="middle" textAlign="center" className='register'>

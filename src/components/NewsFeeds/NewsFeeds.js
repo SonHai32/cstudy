@@ -1,10 +1,11 @@
 import React from 'react'
-import {Segment,Header,Icon,Label, Feed,Image, Divider, Grid, Form, TextArea, Menu, Button, List, Responsive, Modal} from 'semantic-ui-react'
+import {Segment,Header,Icon, Feed,Image, Divider, Form, TextArea, Button, List, Responsive, Dropdown, Container} from 'semantic-ui-react'
 import uuid from 'uuidv4'
 import firebase from '../../firebase'
 import FileModal from './FileModal'
 import ImageModal from './ImageModal'
 import moment from 'moment'
+import hash from 'js-hash-code'
 class NewsFeeds extends React.Component{
 
     state ={
@@ -35,10 +36,12 @@ class NewsFeeds extends React.Component{
       const postLoaded = []
       ref.on('child_added',snap =>{
         ref.child(snap.key).on('child_added',snap => postLoaded.push(snap.val()));
-        this.setState({postFromDatabase: this.state.postFromDatabase.concat(postLoaded)})
+        this.setState({postFromDatabase: postLoaded.sort((a,b) =>{return b.timestamp-a.timestamp})})
    
         
       })
+   
+      
   
     }
 
@@ -49,6 +52,7 @@ class NewsFeeds extends React.Component{
     }
     
     handlePostChange = (e, { value}) =>{
+      e.preventDefault();
       this.setState({post: value})
     }
     
@@ -72,7 +76,7 @@ class NewsFeeds extends React.Component{
     }
 
     uploadFile = (file, metadata) =>{
-      const filePath = this.state.user.uid+'/temporaryMedia/image/'+uuid()+'.jpg'
+      const filePath = this.state.user.uid+'/media/image/'+uuid()+'.jpg'
 
       this.setState({
         uploadStatus : 'uploading',
@@ -93,8 +97,7 @@ class NewsFeeds extends React.Component{
             
                })
               .catch(err=>console.log(err))
-            
-            setTimeout(()=>{this.state.imagePost.forEach(imagePost => {if(imagePost.length > 0 ) {this.deleteImageFromStorge(imagePost.imagePath)}}) ;this.setState({imagePost: []})},1200000) // if user doesn't post this will be delete in 20 minutesetTimeout(()=>{this.state.imagePost.forEach(imagePost => this.deleteImageFromStorge(imagePost.imagePath)) ;this.setState({imagePost: []})},5000) // if user doesn't post this will be delete in 20 minute
+          
             })
           }
         )
@@ -111,19 +114,18 @@ class NewsFeeds extends React.Component{
           postText: this.state.post
         }
         const postChild = this.state.user.uid+uuid()+'/post';
-        console.log(postCreate.postImages)
         this.state.databaseRef.child(postChild).set(postCreate).then(()=>this.setState({post: '', imagePost: []}))
         
-
       }
 
+      
       displayImagePost = ({imagePost}) =>(
         imagePost.length > 0 ? 
         <Segment size='large' >
-          <List  horizontal>
+          <List horizontal>
           
               {imagePost.map((val,key) => (
-                <List.Item key={key} style={{marginRight: '15px'}}> 
+                <List.Item key={key+uuid} style={{marginRight: '15px'}}> 
                   <Image rounded size='small' key={val.downloadURL} src={val.downloadURL} label={{as: 'a' ,name: key, corner:'right', icon:'remove',size: 'mini',color:'red',onClick: this.removeImagePost}} /> 
                 </List.Item> ) )}
                 
@@ -162,7 +164,6 @@ class NewsFeeds extends React.Component{
 
     render(){
         const {user,post,postFromDatabase} = this.state;
-        const postImages = [];
         return(
       <React.Fragment>
         
@@ -236,31 +237,64 @@ class NewsFeeds extends React.Component{
       {this.state.post.length > 0 || this.state.imagePost.length >0 ? <Button  onClick={this.savePost} fluid style={{marginTop: '20px'}}>
         Post
       </Button> : ''}
-         
+        
     </Segment>
     
       
     
       {postFromDatabase.length > 0 ? (
-        postFromDatabase.map((value, key) =>(
-         
+        postFromDatabase.map((val, key) =>(
+          
           <Segment >
          
-        
+          <Feed size='large'>
+              <Feed.Event>
+              <Feed.Label image ={val.avatar} />
+              <Feed.Content>
+                <Feed.Summary> 
+                <Feed.User content={val.createByName} />
+                <Feed.Date>
+                  {moment(val.timestamp).fromNow()}
+                  <Dropdown  
+                    icon='setting'
+                    basic
+                    floating
+                    inline
+                    clearable
+                  
+                    
+                  />
+                  
+                </Feed.Date>
+                </Feed.Summary>
+
+                
+                 
+           
+              </Feed.Content>
+              
+              </Feed.Event>
+            
+          </Feed>
+          
           <Feed size='large'  >
           
           <Feed.Event>
-            <Feed.Label image={value.avatar} />
             <Feed.Content >
-              <Feed.Summary user={value.createByName} date={moment(value.timestamp).fromNow()} />
-              <Feed.Extra text content={value.postText} />
-              {value.postImages.length > 0 ? (
-                value.postImages.map((value,key) =>(
-               
-                    <List horizontal  >
-                      <List.Item as='a'  key={key}>
-                        <img style={{marginLeft: '10px',width: '500px'}} src={value.downloadURL} name={value.downloadURL} onClick={this.openImageModal} />
+              <Container fluid text textAlign='justified' content={val.postText}>
+
+              </Container>
+              {val.postImages ? (
+                val.postImages.map((value,key) =>(        
+                    <List key={val.createByUid+val.timestamp+uuid()+hash(value.downloadURL)} horizontal  >
+                      <List.Item key={'list'+val.createByUid+val.timestamp+uuid()+hash(value.downloadURL)}   as='a'  >
+                       
+                       
+                          <Image centered fluid key={'image'+val.createByUid+val.timestamp+uuid()+hash(value.downloadURL)} src={value.downloadURL} name={value.downloadURL} onClick={this.openImageModal} />
+                          {/* <img style={{padding: '10px 10px'}} src={value.downloadURL} name={value.downloadURL} onClick={this.openImageModal} />
+                     */}
                         <ImageModal 
+                         
                           imageModal={this.state.imageModalStatus} 
                           closeModal={this.closeImageModal}
                           imageURL={this.state.imageModalURL} />
@@ -277,14 +311,14 @@ class NewsFeeds extends React.Component{
           </Feed.Event>
           <Divider />
           
-            <Button.Group  fluid  color='blue' >
-              <Button style={{border: 'none'}} basic  > 
-                <Icon name='thumbs up ' color='blue' inverted /> Like
+            <Button.Group fluid  color='blue' >
+            <Button basic size='medium' >
+                <Icon name='thumbs up' color='blue' /> Like
               </Button>
-              <Button style={{border: 'none'}} basic >
+              <Button basic size='medium' >
                 <Icon name='comment outline' /> Comment
               </Button>
-              <Button style={{border: 'none'}} basic size='medium' >
+              <Button  basic size='medium' >
                 <Icon name='share' /> Share 
               </Button>
             </Button.Group>

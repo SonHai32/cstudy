@@ -1,8 +1,7 @@
 import React from 'react';
 import {connect} from 'react-redux'
 import './App.css';
-import firebase from '../firebase'
-import { Button, Grid, Header, Segment, Comment, Label,Image, Icon } from 'semantic-ui-react';
+import {  Grid} from 'semantic-ui-react';
 import HeaderPanel from './Header/header'
 import SidePanelLeft from './SidePanel/SidePanelLeft'
 import SidePanelRight from './SidePanel/SidePanelRight'
@@ -16,7 +15,7 @@ const App = ({currentUser}) =>(
     <HeaderPanel />
     <SidePanelLeft currentUser={currentUser} />
     <SidePanelRight />
-    <Grid.Column  style={{width: '60%' ,marginTop: '90px', marginLeft: '200px', marginRight: '100px'}}>
+    <Grid.Column  style={{width: '40%' ,marginTop: '90px', marginLeft: '200px', marginRight: '100px'}}>
       <NewsFeeds currentUser={currentUser} />
     </Grid.Column>
     
