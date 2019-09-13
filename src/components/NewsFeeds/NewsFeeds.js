@@ -1,5 +1,5 @@
 import React from 'react'
-import {Segment,Header,Icon, Feed,Image, Divider, Form, TextArea, Button, List, Responsive, Dropdown, Container, Loader, Dimmer} from 'semantic-ui-react'
+import {Segment,Header,Icon, Feed,Image, Divider, Form, TextArea, Button, List, Responsive, Dropdown, Container, Loader, Dimmer, Label} from 'semantic-ui-react'
 import uuid from 'uuidv4'
 import firebase from '../../firebase'
 import FileModal from './FileModal'
@@ -25,7 +25,22 @@ class NewsFeeds extends React.Component{
       databaseRef: firebase.database().ref('posts'),
       imageLoading: false,
       postLoading: false,
-     
+      postDrowdownOptions: [
+        {
+          key: 'Save Post',
+          text: <span>Save Post</span>,
+
+          
+        },
+        {
+          key: 'Report this post',
+          text :  <span onClick={this.handleMessage} ><Icon name='warning' />Report this post</span>,
+          
+        
+      },
+
+      ]
+   
     }
 
     componentDidMount(){
@@ -261,27 +276,33 @@ class NewsFeeds extends React.Component{
       {postFromDatabase.length > 0 ? (
         postFromDatabase.map((val, key) =>(
           
-          <Segment >
+          <Segment  >
          
           <Feed size='large'>
               <Feed.Event>
               <Feed.Label image ={val.avatar} />
               <Feed.Content>
                 <Feed.Summary> 
+                <Dropdown
+              
+                  closeOnChange
+                  options={this.state.postDrowdownOptions}
+                  floating
+                  pointing='top right'
+                  icon={null}
+                  style={{float: 'right'}}
+                  trigger={<i className="fas fa-ellipsis-h"></i>}
+                />
                 <Feed.User content={val.createByName} />
                 <Feed.Date>
                   {moment(val.timestamp).fromNow()}
-                  <Dropdown  
-                    icon='setting'
-                    basic
-                    floating
-                    inline
-                    clearable
-                  
-                    
-                  />
                   
                 </Feed.Date>
+                
+                </Feed.Summary>
+                <Feed.Summary>
+                  <i style={{opacity: 0.5, fontSize: 14}} className="fas fa-globe-asia"></i> 
+               
                 </Feed.Summary>
 
                 
@@ -325,6 +346,12 @@ class NewsFeeds extends React.Component{
             </Feed.Content>
             
           </Feed.Event>
+          <Divider />
+
+          <Container fluid> 
+            <Icon name='thumbs up' color='blue'  size='small' /> <span style={{opacity: 0.6}}>20 likes</span>
+            <span style={{float: 'right',opacity: 0.6}} >20 comnents</span>
+          </Container>
           <Divider />
           
             <Button.Group fluid  color='blue' >
