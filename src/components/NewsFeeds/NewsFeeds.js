@@ -1,5 +1,5 @@
 import React from 'react'
-import {Segment,Header,Icon, Feed,Image, Divider, Form, TextArea, Button, List, Responsive, Dropdown, Container} from 'semantic-ui-react'
+import {Segment,Header,Icon, Feed,Image, Divider, Form, TextArea, Button, List, Responsive, Dropdown, Container, Loader, Dimmer} from 'semantic-ui-react'
 import uuid from 'uuidv4'
 import firebase from '../../firebase'
 import FileModal from './FileModal'
@@ -22,7 +22,9 @@ class NewsFeeds extends React.Component{
       postCreate: [],
       postFromDatabase: [],
       storeRef: firebase.storage().ref(),
-      databaseRef: firebase.database().ref('posts')
+      databaseRef: firebase.database().ref('posts'),
+      imageLoading: false,
+      postLoading: false,
      
     }
 
@@ -46,13 +48,10 @@ class NewsFeeds extends React.Component{
     }
 
 
-    handleLikeClicked = event =>{
-        event.preventDefault();
-        this.setState({like: !this.state.like })
-    }
+
     
     handlePostChange = (e, { value}) =>{
-      e.preventDefault();
+    
       this.setState({post: value})
     }
     
@@ -77,29 +76,36 @@ class NewsFeeds extends React.Component{
 
     uploadFile = (file, metadata) =>{
       const filePath = this.state.user.uid+'/media/image/'+uuid()+'.jpg'
-
+      
       this.setState({
-        uploadStatus : 'uploading',
+  
+        imageLoading: true,
         uploadTask: this.state.storeRef.child(filePath).put(file,metadata)
       
         },
           () => {
             this.state.uploadTask.on('state_changed', snap =>{
-              const percentUploaded = Math.round((snap.bytesTransferred / snap.totalBytes)*100)
+              const percentUploaded = Math.round((snap.bytesTransferred / snap.totalBytes)*100);
+              console.log(percentUploaded)
               this.setState({percentUploaded});
             
+            if(percentUploaded === 100){
+              this.setState({percentUploaded: 0})
+              setTimeout(()=>{
+                this.state.uploadTask.snapshot.ref
+              .getDownloadURL()
+              .then(downloadURL => {
+                const image = {downloadURL: downloadURL, imagePath: this.state.uploadTask.location_.path}
+                this.setState({imagePost: this.state.imagePost.concat(image),imageLoading: false})
+              
+                 })
+                .catch(err=>console.log(err))
+              },1000)  
             
-            this.state.uploadTask.snapshot.ref
-            .getDownloadURL()
-            .then(downloadURL => {
-              const image = {downloadURL: downloadURL, imagePath: this.state.uploadTask.location_.path}
-              this.setState({imagePost: this.state.imagePost.concat(image)})
+            }
             
-               })
-              .catch(err=>console.log(err))
-          
             })
-          }
+          },err=>{console.log(err)}
         )
       }
 
@@ -120,21 +126,50 @@ class NewsFeeds extends React.Component{
 
       
       displayImagePost = ({imagePost}) =>(
-        imagePost.length > 0 ? 
-        <Segment size='large' >
+        // this.state.uploadStatus.includes('uploading')  ? 
+        // <Segment size='large' loading={this.state.percentUploaded < 100} >
+        //   <List horizontal>
+          
+        //       {imagePost.map((val,key) => (
+        //         <List.Item key={key+uuid} style={{marginRight: '15px'}}> 
+
+        //             <Image  rounded size='small' key={val.downloadURL} src={val.downloadURL} label={{as: 'a' ,name: key, corner:'right', icon:'remove',size: 'mini',color:'red',onClick: this.removeImagePost}} /> 
+                
+        //         </List.Item> ) )}
+                
+        //     <List.Item>
+        //       <Icon style={{cursor: 'pointer', boder: 'solid 2px '}} color='black' inverted name='add' size='big' onClick={this.openModal} />
+        //     </List.Item>
+        //   </List>
+          
+        // </Segment> : ''
+        <Dimmer.Dimmable  > 
+          <Dimmer inverted active={this.state.percentUploaded > 0 && this.state.percentUploaded <100}>
+            <Loader>Loading</Loader>
+           
+          </Dimmer>
+
           <List horizontal>
           
               {imagePost.map((val,key) => (
-                <List.Item key={key+uuid} style={{marginRight: '15px'}}> 
-                  <Image rounded size='small' key={val.downloadURL} src={val.downloadURL} label={{as: 'a' ,name: key, corner:'right', icon:'remove',size: 'mini',color:'red',onClick: this.removeImagePost}} /> 
-                </List.Item> ) )}
-                
-            <List.Item>
-              <Icon style={{cursor: 'pointer', boder: 'solid 2px '}} color='black' inverted name='add' size='big' onClick={this.openModal} />
+                  <List.Item key={key+uuid} style={{marginRight: '15px'}}> 
+  
+                      <Image wrapped rounded size='small' key={val.downloadURL} src={val.downloadURL} label={{as: 'a' ,name: key, corner:'right', icon:'remove',size: 'tiny',color:'red',onClick: this.removeImagePost}} /> 
+                  
+                  </List.Item> ) )}
+                  
+              {imagePost.length > 0 ? 
+                <List.Item>
+              <Icon link color='black' inverted name='add' size='big' onClick={this.openModal} />
             </List.Item>
-          </List>
+            : ''  
+          }
+            </List>
+            
+    
+     
           
-        </Segment> : ''
+        </Dimmer.Dimmable>
       )
       
       deleteImageFromStorge = imagePath =>{
@@ -188,15 +223,14 @@ class NewsFeeds extends React.Component{
         <Form style={{marginTop: '5px'}}>
          <Form.Group >
            <Image avatar src={user.photoURL}/>
-           <TextArea placeholder='What do you thing ? ' value={post} onChange={this.handlePostChange} >
-          
+           <TextArea placeholder="What do you thing ?  "   value={post} onChange={this.handlePostChange} >
+            
           </TextArea>
          </Form.Group>
         
         </Form>
-       
-      <Responsive minWidth={1800}>
-      <Button.Group fluid >
+
+      <Button.Group compact fluid widths={4} positive attached='bottom' >
         
       <Button circular onClick={this.openModal}  >
               <Icon name='photo' /> Photo/Video
@@ -205,35 +239,17 @@ class NewsFeeds extends React.Component{
               <Icon name='user plus' /> Tag Friends
             </Button>
          
-            <Button circular>
-              <Icon name='music' /> Music
-            </Button>
+         
             <Button circular>
               <Icon name='smile outline' /> Feeling
             </Button>
-            <Button circular>
-              <Icon name='location arrow' /> Check in
-            </Button>
+          
             <Button>
               <Icon name='list' /> More
              </Button>
       </Button.Group>
-      </Responsive>
-      <Responsive maxWidth={1790} >
-      <Button.Group fluid >
-      <Button circular  >
-              <Icon name='photo' /> Photo/Video
-            </Button>
-            <Button circular>
-              <Icon name='user plus' /> Tag Friends
-            </Button>
-         
-            
-            <Button>
-              <Icon name='list' /> More
-             </Button>
-      </Button.Group>
-      </Responsive>
+     
+  
       {this.state.post.length > 0 || this.state.imagePost.length >0 ? <Button  onClick={this.savePost} fluid style={{marginTop: '20px'}}>
         Post
       </Button> : ''}
