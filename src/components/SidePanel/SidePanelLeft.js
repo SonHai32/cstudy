@@ -140,12 +140,12 @@ class SidePanelLeft extends React.Component{
             
             <Menu.Item 
 
-              name='NewsFeed'
-              active={activeItems === 'NewsFeed'}
+              name='Bảng Tin'
+              active={activeItems === 'Bảng Tin'}
               onClick={this.handleItemClicked}
              
             >
-              <Header as='h4'><Icon name='newspaper' />NewsFeed</Header>
+              <Header as='h4'><Icon name='newspaper' />Bảng Tin</Header>
               </Menu.Item>
           
 

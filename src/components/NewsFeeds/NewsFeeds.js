@@ -4,8 +4,13 @@ import uuid from 'uuidv4'
 import firebase from '../../firebase'
 import FileModal from './FileModal'
 import ImageModal from './ImageModal'
-import moment from 'moment'
+import * as moment from 'moment'
 import hash from 'js-hash-code'
+
+
+
+
+
 class NewsFeeds extends React.Component{
 
     state ={
@@ -27,14 +32,14 @@ class NewsFeeds extends React.Component{
       postLoading: false,
       postDrowdownOptions: [
         {
-          key: 'Save Post',
-          text: <span>Save Post</span>,
+          key: 'savePost',
+          text: <span><Icon circular size='small' name='tag' />Lưu bài viết</span>,
 
           
         },
         {
-          key: 'Report this post',
-          text :  <span onClick={this.handleMessage} ><Icon name='warning' />Report this post</span>,
+          key: 'postReport',
+          text :  <span onClick={this.handleMessage} ><Icon circular size='small' name='warning' />Báo cáo bài viết</span>,
           
         
       },
@@ -57,7 +62,7 @@ class NewsFeeds extends React.Component{
    
         
       })
-   
+    
       
   
     }
@@ -91,7 +96,7 @@ class NewsFeeds extends React.Component{
 
     uploadFile = (file, metadata) =>{
       const filePath = this.state.user.uid+'/media/image/'+uuid()+'.jpg'
-      
+     
       this.setState({
   
         imageLoading: true,
@@ -126,18 +131,100 @@ class NewsFeeds extends React.Component{
 
       savePost = event =>{
         event.preventDefault();
+        const postChild = this.state.user.uid+uuid()+'/post';
         const postCreate ={
+          postChild: postChild,
           createByUid: this.state.user.uid,
           createByName: this.state.user.displayName,
           avatar: this.state.user.photoURL ,
           timestamp: Date.now(),
           postImages: Array().concat(this.state.imagePost),
-          postText: this.state.post
+          postText: this.state.post,
+          liked: [{username: 'null', userUID: 'null'}]
         }
-        const postChild = this.state.user.uid+uuid()+'/post';
+        
         this.state.databaseRef.child(postChild).set(postCreate).then(()=>this.setState({post: '', imagePost: []}))
         
       }
+
+
+      
+
+      handleLikeClicked = (event, {name}) =>{
+        // const checkLike = userUID =>{
+        //  return this.state.user.uid === userUID
+        // }
+        console.log(name)
+        event.preventDefault();
+        const post = this.state.postFromDatabase.filter((val,key,arr)=>{
+          return val.postChild === name
+        })
+
+        
+        let userLiked;
+      
+        let postLikedUpdate = []
+
+        let imageNotExist;
+
+        post.forEach(val =>{
+          postLikedUpdate = val.liked
+          val.liked.forEach((val,index) =>{
+            userLiked = val.userUID === this.state.user.uid
+            imageNotExist = val.imagePost === undefined
+          })
+          if(userLiked){
+            postLikedUpdate = val.liked.filter((val,index,arr)  =>{
+              return val.userUID !== this.state.user.uid
+            })
+          }else{
+            let user ={username: this.state.user.displayName, userUID: this.state.user.uid};
+            postLikedUpdate.push(user);
+          }
+          
+        })
+
+        
+        let postUpdate
+        if(imageNotExist){
+          post.forEach(val=>{
+            postUpdate ={
+              postChild: val.postChild,
+              createByUid: val.createByUid,
+              createByName: val.createByName,
+              avatar: val.avatar,
+              timestamp: val.timestamp,
+              postText: val.postText,
+              liked: postLikedUpdate
+            }
+            
+          
+          })
+         
+        }else{
+          post.forEach(val=>{
+            postUpdate ={
+              postChild: val.postChild,
+              createByUid: val.createByUid,
+              createByName: val.createByName,
+              avatar: val.avatar,
+              timestamp: val.timestamp,
+              postImages: val.postImages ,
+              postText: val.postText,
+              liked: postLikedUpdate
+            }
+            
+          
+          })
+        }
+       
+  
+         this.state.databaseRef.child(name).set(postUpdate).then(()=>this.addPostListener()).catch(err=>console.log(err))
+         
+      
+      }
+
+      
 
       
       displayImagePost = ({imagePost}) =>(
@@ -214,6 +301,8 @@ class NewsFeeds extends React.Component{
 
     render(){
         const {user,post,postFromDatabase} = this.state;
+       
+
         return(
       <React.Fragment>
         
@@ -223,10 +312,10 @@ class NewsFeeds extends React.Component{
         />
         
     <Segment stacked>
-      
+    
         <Header as='h3' block>
         
-          <Header.Content>Create Post <Icon name='edit outline' /></Header.Content>
+          <Header.Content style={{opacity: 0.6}}>Tạo Bài Viết <Icon name='edit outline' /></Header.Content>
         
         </Header>
         
@@ -245,57 +334,59 @@ class NewsFeeds extends React.Component{
         
         </Form>
 
-      <Button.Group compact fluid widths={4} positive attached='bottom' >
+      <Button.Group  compact fluid widths={4}  >
         
-      <Button circular onClick={this.openModal}  >
-              <Icon name='photo' /> Photo/Video
+      <Button inverted style={{background: '#6FBE42'}}  onClick={this.openModal}  >
+              <Icon name='photo' /> Ảnh/Video
             </Button>
-            <Button circular>
+            <Button inverted style={{background: '#6FBE42'}}>
               <Icon name='user plus' /> Tag Friends
             </Button>
          
          
-            <Button circular>
-              <Icon name='smile outline' /> Feeling
+            <Button inverted style={{background: '#6FBE42'}}>
+              <Icon name='smile outline' /> Cảm Xúc
             </Button>
           
-            <Button>
-              <Icon name='list' /> More
+            <Button inverted style={{background: '#6FBE42'}}>
+              <Icon name='list' /> Khác
              </Button>
       </Button.Group>
      
   
-      {this.state.post.length > 0 || this.state.imagePost.length >0 ? <Button  onClick={this.savePost} fluid style={{marginTop: '20px'}}>
+      {this.state.post.length > 0 || this.state.imagePost.length >0 ? <Button onClick={this.savePost} fluid style={{marginTop: '20px',background:'#ecf7e7'}}>
         Post
       </Button> : ''}
         
     </Segment>
-    
+        
       
     
       {postFromDatabase.length > 0 ? (
         postFromDatabase.map((val, key) =>(
           
           <Segment  >
-         
+      
           <Feed size='large'>
               <Feed.Event>
               <Feed.Label image ={val.avatar} />
               <Feed.Content>
                 <Feed.Summary> 
                 <Dropdown
-              
+                  inline
                   closeOnChange
                   options={this.state.postDrowdownOptions}
-                  floating
                   pointing='top right'
                   icon={null}
-                  style={{float: 'right'}}
-                  trigger={<i className="fas fa-ellipsis-h"></i>}
+                  style={{float: 'right', zIndex: 1000}}
+                  trigger={<i style={{opacity: 0.5}} className="fas fa-ellipsis-h"></i>}
                 />
                 <Feed.User content={val.createByName} />
                 <Feed.Date>
-                  {moment(val.timestamp).fromNow()}
+
+                {moment(val.timestamp).locale('vi').fromNow()}
+                {/* {moment(val.timestamp).fromNow()} */}
+               
                   
                 </Feed.Date>
                 
@@ -354,8 +445,9 @@ class NewsFeeds extends React.Component{
           </Container>
           <Divider />
           
-            <Button.Group fluid  color='blue' >
-            <Button basic size='medium' >
+            <Button.Group fluid   >
+            <Button name={val.postChild} onClick={this.handleLikeClicked} basic size='medium'>
+            
                 <Icon name='thumbs up' color='blue' /> Like
               </Button>
               <Button basic size='medium' >
