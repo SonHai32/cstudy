@@ -151,41 +151,36 @@ class NewsFeeds extends React.Component{
       
 
       handleLikeClicked = (event, {name}) =>{
-        // const checkLike = userUID =>{
-        //  return this.state.user.uid === userUID
-        // }
-        console.log(name)
+     
         event.preventDefault();
         const post = this.state.postFromDatabase.filter((val,key,arr)=>{
           return val.postChild === name
         })
 
+        console.log(post[0].avatar);
+
         
-        let userLiked;
-      
-        let postLikedUpdate = []
+        
+        let postLiked= post[0].liked;
 
-        let imageNotExist;
-
-        post.forEach(val =>{
-          postLikedUpdate = val.liked
-          val.liked.forEach((val,index) =>{
-            userLiked = val.userUID === this.state.user.uid
-            imageNotExist = val.imagePost === undefined
-          })
-          if(userLiked){
-            postLikedUpdate = val.liked.filter((val,index,arr)  =>{
-              return val.userUID !== this.state.user.uid
-            })
-          }else{
-            let user ={username: this.state.user.displayName, userUID: this.state.user.uid};
-            postLikedUpdate.push(user);
-          }
+        const  currentUserLiked = postLiked.some(val=>{
           
+          return val.userUID === this.state.user.uid;
+         
         })
 
-        
-        let postUpdate
+
+        const imageNotExist = post[0].postImages === undefined;
+      
+        if(currentUserLiked){
+            postLiked = postLiked.filter((val,index,arr)=>{
+            return val.userUID !== this.state.user.uid
+          })
+        }else{
+          postLiked.push({username: this.state.user.displayName, userUID: this.state.user.uid})
+        }
+  
+        let postUpdate ;
         if(imageNotExist){
           post.forEach(val=>{
             postUpdate ={
@@ -195,7 +190,7 @@ class NewsFeeds extends React.Component{
               avatar: val.avatar,
               timestamp: val.timestamp,
               postText: val.postText,
-              liked: postLikedUpdate
+              liked: postLiked
             }
             
           
@@ -211,7 +206,7 @@ class NewsFeeds extends React.Component{
               timestamp: val.timestamp,
               postImages: val.postImages ,
               postText: val.postText,
-              liked: postLikedUpdate
+              liked: postLiked
             }
             
           
@@ -220,7 +215,7 @@ class NewsFeeds extends React.Component{
        
   
          this.state.databaseRef.child(name).set(postUpdate).then(()=>this.addPostListener()).catch(err=>console.log(err))
-         
+  
       
       }
 
