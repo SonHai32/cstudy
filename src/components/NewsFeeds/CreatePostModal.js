@@ -13,18 +13,32 @@ class CreatePostModal extends React.Component{
                     <Form style={{marginTop: '5px'}}>
                         <Form.Group >
                             <Image inline size='tiny' avatar src={user.photoURL}/>
+<<<<<<< HEAD
 
 
                             <Form.Field style={{width: '100%'}}>
                                 <Input placeholder="Bạn đang nghĩ gì ?" transparent style={{height: '100%',fontSize: 16}} />
 
+=======
+          
+
+                            <Form.Field style={{width: '100%'}}>
+                                <Input placeholder="Bạn đang nghĩ gì ?" transparent style={{height: '100%',fontSize: 16}} />
+                               
+>>>>>>> 790d2abb226786a80043405d42e9d45478d1dfb4
                             </Form.Field>
 
                         </Form.Group>
 
+<<<<<<< HEAD
 
                         <Form.Button  color='black' fluid style={{background: '#64cd82',marginTop: '50px'}}>Chia sẻ</Form.Button>
 
+=======
+                      
+                        <Form.Button  color='black' fluid style={{background: '#64cd82',marginTop: '50px'}}>Chia sẻ</Form.Button>
+        
+>>>>>>> 790d2abb226786a80043405d42e9d45478d1dfb4
                     </Form>
                 </Modal.Content>
             </Modal>
@@ -32,4 +46,8 @@ class CreatePostModal extends React.Component{
     }
 }
 
+<<<<<<< HEAD
 export default CreatePostModal 
+=======
+export default CreatePostModal
+>>>>>>> 790d2abb226786a80043405d42e9d45478d1dfb4
