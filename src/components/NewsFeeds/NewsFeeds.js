@@ -432,26 +432,30 @@ class NewsFeeds extends React.Component{
             </Feed.Content>
             
           </Feed.Event>
-          <Divider />
+       
 
-          <Container fluid> 
-            <Icon name='thumbs up' color='blue'  size='small' /> <span style={{opacity: 0.6}}>20 likes</span>
+          <Container style={{marginTop:'15px'}} fluid> 
+          <Icon 
+            name={val.liked.length -1 !==0 ? 'thumbs up': ''} 
+            color='blue'  size='small' /> 
+            <span style={{opacity: 0.6}}>{val.liked.length -1 === 0 ? '': val.liked.length -1 +' Thích' }</span>
             <span style={{float: 'right',opacity: 0.6}} >20 comnents</span>
           </Container>
+         
           <Divider />
-          
-            <Button.Group fluid   >
-            <Button name={val.postChild} onClick={this.handleLikeClicked} basic size='medium'>
+            <Button.Group fluid size='small' compact >
+            <Button  name={val.postChild} onClick={this.handleLikeClicked} basic compact >
             
-                <Icon name='thumbs up' color='blue' /> Like
+                <Icon name='thumbs up'  color={val.liked.some(val=>{return val.userUID === user.uid}) ? 'blue' :''} /> Like
               </Button>
-              <Button basic size='medium' >
+              <Button basic compact >
                 <Icon name='comment outline' /> Comment
               </Button>
-              <Button  basic size='medium' >
+              <Button  basic compact>
                 <Icon name='share' /> Share 
               </Button>
             </Button.Group>
+            <Divider />
       
          
         
