@@ -20,6 +20,7 @@ class NewsFeeds extends React.Component{
       fileModal: false,
       imageModalStatus: false,
       imageModalURL: '',
+      postModal: false,
       uploadTask: null,
       uploadStatus : '',
       percentUploaded : 0,
@@ -59,27 +60,20 @@ class NewsFeeds extends React.Component{
       ref.on('child_added',snap =>{
         ref.child(snap.key).on('child_added',snap => postLoaded.push(snap.val()));
         this.setState({postFromDatabase: postLoaded.sort((a,b) =>{return b.timestamp-a.timestamp})})
-   
         
       })
     
-      
   
     }
 
 
 
-    
-    handlePostChange = (e, { value}) =>{
-    
-      this.setState({post: value})
-    }
-    
-    openModal = () =>{
+  
+    openFileModal = () =>{
       this.setState({fileModal: true})
     }
 
-    closeModal = () =>{
+    closeFileModal = () =>{
 
       this.setState({fileModal: false})
     }
@@ -257,7 +251,7 @@ class NewsFeeds extends React.Component{
                   
               {imagePost.length > 0 ? 
                 <List.Item>
-              <Icon link color='black' inverted name='add' size='big' onClick={this.openModal} />
+              <Icon link color='black' inverted name='add' size='big' onClick={this.openFileModal} />
             </List.Item>
             : ''  
           }
@@ -303,7 +297,7 @@ class NewsFeeds extends React.Component{
         
         <FileModal fileModal={this.state.fileModal}
                    uploadFile = {this.uploadFile}
-                   closeModal = {this.closeModal}
+                   closeModal = {this.closeFileModal}
         />
         
     <Segment stacked>
@@ -331,7 +325,7 @@ class NewsFeeds extends React.Component{
 
       <Button.Group  compact fluid widths={4}  >
         
-      <Button inverted style={{background: '#6FBE42'}}  onClick={this.openModal}  >
+      <Button inverted style={{background: '#6FBE42'}}  onClick={this.openFileModal}  >
               <Icon name='photo' /> Ảnh/Video
             </Button>
             <Button inverted style={{background: '#6FBE42'}}>
