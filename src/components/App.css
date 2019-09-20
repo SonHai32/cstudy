@@ -1,3 +1,7 @@
+.App {
+    background: #EDEDED;
+}
+
 *::-webkit-scrollbar {
     display: none
 }
@@ -6,4 +10,39 @@
     height: 965px;
     background: #eee;
     padding: 1em;
+}
+
+.noselect {
+    -webkit-touch-callout: element;
+    /* iOS Safari */
+    -webkit-user-select: element;
+    /* Safari */
+    -khtml-user-select: element;
+    /* Konqueror HTML */
+    -moz-user-select: element;
+    /* Firefox */
+    -ms-user-select: element;
+    /* Internet Explorer/Edge */
+    user-select: element;
+    /* Non-prefixed version, currently
+                                    supported by Chrome and Opera */
+}
+
+.btn__fullwidth__createPost {
+    width: 100%;
+    height: 40px;
+    outline: none;
+    border: none;
+    background: #64cd82;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.btn__fullwidth__createPost:hover {
+    background: #007F1E;
+    transition-delay: 100ms;
+}
+
+.btn_createpost:hover {
+    background: #007F1E;
 }

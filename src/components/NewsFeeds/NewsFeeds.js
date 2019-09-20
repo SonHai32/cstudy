@@ -1,11 +1,13 @@
 import React from 'react'
-import {Segment,Header,Icon, Feed,Image, Divider, Form, TextArea, Button, List, Responsive, Dropdown, Container, Loader, Dimmer, Label} from 'semantic-ui-react'
+import {Segment,Header,Icon, Feed,Image, Divider, Form, TextArea, Button, List, Responsive, Dropdown, Container, Loader, Dimmer, Label, Input} from 'semantic-ui-react'
 import uuid from 'uuidv4'
 import firebase from '../../firebase'
 import FileModal from './FileModal'
 import ImageModal from './ImageModal'
 import * as moment from 'moment'
 import hash from 'js-hash-code'
+import editIcon from '../../Images/edit.svg'
+import CreatePostModal from './CreatePostModal'
 
 
 
@@ -26,6 +28,7 @@ class NewsFeeds extends React.Component{
       percentUploaded : 0,
       imagePost: [],
       postCreate: [],
+      postModal: false,
       postFromDatabase: [],
       storeRef: firebase.storage().ref(),
       databaseRef: firebase.database().ref('posts'),
@@ -86,6 +89,14 @@ class NewsFeeds extends React.Component{
     closeImageModal = () =>{
       this.setState({imageModalStatus: false, imageModalURL:''})
 
+    }
+
+    openPostModal = () =>{
+      this.setState({postModal: true})
+    }
+
+    closePostModal = () =>{
+      this.setState({postModal: false})
     }
 
     uploadFile = (file, metadata) =>{
@@ -295,16 +306,22 @@ class NewsFeeds extends React.Component{
         return(
       <React.Fragment>
         
-        <FileModal fileModal={this.state.fileModal}
-                   uploadFile = {this.uploadFile}
-                   closeModal = {this.closeFileModal}
+        <FileModal 
+          fileModal={this.state.fileModal}
+          uploadFile = {this.uploadFile}
+          closeModal = {this.closeFileModal}
         />
+        <CreatePostModal 
+          modal={this.state.postModal} 
+          closeModal={this.closePostModal}
+          user={user}
+          />
         
     <Segment stacked>
     
-        <Header as='h3' block>
+        <Header as='h3' block style={{background :'#F9FCFA'}}> 
         
-          <Header.Content style={{opacity: 0.6}}>Tạo Bài Viết <Icon name='edit outline' /></Header.Content>
+          <Header.Content style={{opacity: 0.6}}> <Image spaced='right' style={{width:'30px'} } src={editIcon} />Tạo Bài Viết  </Header.Content>
         
         </Header>
         
@@ -313,17 +330,21 @@ class NewsFeeds extends React.Component{
 
     
 
-        <Form style={{marginTop: '5px'}}>
-         <Form.Group >
-           <Image avatar src={user.photoURL}/>
-           <TextArea placeholder="What do you thing ?  "   value={post} onChange={this.handlePostChange} >
-            
-          </TextArea>
-         </Form.Group>
+        <Container   fluid style={{width: '100%', height: '80px'}}>
         
-        </Form>
+           
+            <Header  textAlign='left'>
+              <Image size='large' avatar src={user.photoURL}/> 
+              <span onClick={this.openPostModal} style={{opacity: 0.5}}>Bạn muốn chia sẻ điều gì ?  </span>
+            </Header>
+         
+        
+        </Container>
+        <Button fluid color='teal' onClick={this.openPostModal}>
+          Tạo bài viết của bạn
+        </Button>
 
-      <Button.Group  compact fluid widths={4}  >
+      {/* <Button.Group  compact fluid widths={4}  >
         
       <Button inverted style={{background: '#6FBE42'}}  onClick={this.openFileModal}  >
               <Icon name='photo' /> Ảnh/Video
@@ -340,7 +361,7 @@ class NewsFeeds extends React.Component{
             <Button inverted style={{background: '#6FBE42'}}>
               <Icon name='list' /> Khác
              </Button>
-      </Button.Group>
+      </Button.Group> */}
      
   
       {this.state.post.length > 0 || this.state.imagePost.length >0 ? <Button onClick={this.savePost} fluid style={{marginTop: '20px',background:'#ecf7e7'}}>

@@ -10,7 +10,7 @@ import NewsFeeds from './NewsFeeds/NewsFeeds'
 
 
 const App = ({currentUser}) =>(
-  <Grid>
+  <Grid style={{background : '#EDEDED'}}>
        
     <HeaderPanel />
     <Responsive minWidth={480}>

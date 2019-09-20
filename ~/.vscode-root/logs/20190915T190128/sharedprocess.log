@@ -1,0 +1,32 @@
+[2019-09-15 19:01:32.393] [sharedprocess] [info] main {"machineId":"c57c9fe9f5aec06e8590ef0648d6487c7cdf7d988c2dd1a4be32427d3b752c97"}
+[2019-09-15 19:02:12.377] [sharedprocess] [info] Starting to clean up unused language packs.
+[2019-09-15 19:05:05.169] [sharedprocess] [info] Installing extension: yummygum.city-lights-theme
+[2019-09-15 19:05:06.413] [sharedprocess] [info] Downloaded extension: yummygum.city-lights-theme /tmp/0a750548-c1f2-44cf-88b7-5750ba4c1213
+[2019-09-15 19:05:06.426] [sharedprocess] [info] Extracted extension to /root/.vscode/extensions/.yummygum.city-lights-theme-1.1.5: yummygum.city-lights-theme
+[2019-09-15 19:05:06.426] [sharedprocess] [info] Renamed to /root/.vscode/extensions/yummygum.city-lights-theme-1.1.5
+[2019-09-15 19:05:06.426] [sharedprocess] [info] Installation completed. yummygum.city-lights-theme
+[2019-09-15 19:05:06.455] [sharedprocess] [info] Extensions installed successfully: yummygum.city-lights-theme
+[2019-09-15 19:06:05.969] [sharedprocess] [info] Installing extension: eserozvataf.one-dark-pro-monokai-darker
+[2019-09-15 19:06:07.422] [sharedprocess] [info] Downloaded extension: eserozvataf.one-dark-pro-monokai-darker /tmp/4f98bab6-a0d3-4019-bef7-ad504537c651
+[2019-09-15 19:06:07.469] [sharedprocess] [info] Extracted extension to /root/.vscode/extensions/.eserozvataf.one-dark-pro-monokai-darker-1.1.0: eserozvataf.one-dark-pro-monokai-darker
+[2019-09-15 19:06:07.469] [sharedprocess] [info] Renamed to /root/.vscode/extensions/eserozvataf.one-dark-pro-monokai-darker-1.1.0
+[2019-09-15 19:06:07.469] [sharedprocess] [info] Installation completed. eserozvataf.one-dark-pro-monokai-darker
+[2019-09-15 19:06:07.513] [sharedprocess] [info] Extensions installed successfully: eserozvataf.one-dark-pro-monokai-darker
+[2019-09-15 19:17:30.989] [sharedprocess] [info] Installing extension: kuscamara.electron
+[2019-09-15 19:17:32.883] [sharedprocess] [info] Downloaded extension: kuscamara.electron /tmp/b808bac8-50be-4fad-9247-f2e0ee5f6e59
+[2019-09-15 19:17:32.933] [sharedprocess] [info] Extracted extension to /root/.vscode/extensions/.kuscamara.electron-0.2.5: kuscamara.electron
+[2019-09-15 19:17:32.933] [sharedprocess] [info] Renamed to /root/.vscode/extensions/kuscamara.electron-0.2.5
+[2019-09-15 19:17:32.934] [sharedprocess] [info] Installation completed. kuscamara.electron
+[2019-09-15 19:17:32.966] [sharedprocess] [info] Extensions installed successfully: kuscamara.electron
+[2019-09-15 19:19:06.307] [sharedprocess] [info] Installing extension: pkief.material-icon-theme
+[2019-09-15 19:19:07.082] [sharedprocess] [info] Downloaded extension: pkief.material-icon-theme /tmp/3b522266-3cd0-40eb-bad0-629350eed289
+[2019-09-15 19:19:07.664] [sharedprocess] [info] Extracted extension to /root/.vscode/extensions/.pkief.material-icon-theme-3.9.0: pkief.material-icon-theme
+[2019-09-15 19:19:07.664] [sharedprocess] [info] Renamed to /root/.vscode/extensions/pkief.material-icon-theme-3.9.0
+[2019-09-15 19:19:07.664] [sharedprocess] [info] Installation completed. pkief.material-icon-theme
+[2019-09-15 19:19:07.706] [sharedprocess] [info] Extensions installed successfully: pkief.material-icon-theme
+[2019-09-15 19:20:51.395] [sharedprocess] [info] Installing extension: evan-buss.font-switcher
+[2019-09-15 19:20:51.917] [sharedprocess] [info] Downloaded extension: evan-buss.font-switcher /tmp/42acc1de-a2f7-4184-9e5d-811ed5f1cb4f
+[2019-09-15 19:20:51.926] [sharedprocess] [info] Extracted extension to /root/.vscode/extensions/.evan-buss.font-switcher-3.1.0: evan-buss.font-switcher
+[2019-09-15 19:20:51.926] [sharedprocess] [info] Renamed to /root/.vscode/extensions/evan-buss.font-switcher-3.1.0
+[2019-09-15 19:20:51.926] [sharedprocess] [info] Installation completed. evan-buss.font-switcher
+[2019-09-15 19:20:51.946] [sharedprocess] [info] Extensions installed successfully: evan-buss.font-switcher
