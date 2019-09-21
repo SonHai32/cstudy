@@ -1,17 +1,60 @@
 import React from 'react'
-import { Modal, Header, Icon,Form,Image, Button, Input } from 'semantic-ui-react';
+import { Modal, Header,Form,Image, Button, Input, TextArea } from 'semantic-ui-react';
+import {Picker,emojiIndex} from 'emoji-mart'
+import 'emoji-mart/css/emoji-mart.css'
+
+
 import pictureIcon from '../../Images/picture.svg'
 import tagFriends from '../../Images/tagfriends.svg'
 import locationIcon from '../../Images/location.svg'
 import editIcon from '../../Images/edit.svg'
+import smileIcon from '../../Images/iconsmile.svg'
 
 class CreatePostModal extends React.Component{
 
+    state = {
+        postText: '',
+        emojiPicker: false
+    }
     
+
+
+    handleTogglePicker = () =>{
+        this.setState({emojiPicker: !this.state.emojiPicker})
+    }
+
+    handlePostChange = event =>{
+        this.setState({postText: event.target.value})
+    }
+
+    handleEmojiSelect = emoji =>{
+        const oldPost = this.state.postText;
+        const newPost = this.colonToUnicode(`${oldPost} ${emoji.colons}`)
+        this.setState({postText: newPost})
+        
+    }
+
+    colonToUnicode = message =>{
+    
+        return message.replace(/:[A-Za-z0-9_+-]+:/g, x=>{
+            x = x.replace(/:/g, "");
+            
+            let emoji = emojiIndex.emojis[x];
+        
+            if(emoji !== undefined){
+                let unicode = emoji.native
+                if(unicode !== undefined){
+                    return unicode
+                }
+            }
+
+            x = ":" + x + ":"
+        })
+    }
 
     render(){
 
-        
+        const {postText,emojiPicker} = this.state;
         const {user,modal,closeModal} = this.props;
         
         return(
@@ -29,15 +72,36 @@ class CreatePostModal extends React.Component{
                             <Image inline size='tiny' avatar src={user.photoURL}/>
 
 
-                            <Form.Field style={{width: '100%'}}>
-                                <Input placeholder="Bạn đang nghĩ gì ?" transparent style={{height: '100%',fontSize: 16}} />
+                            <Form.Field  style={{width: '100%'}} >
+                                
+                                {/* <Input  
+                                
+                                    value={postText} 
+                                    type='text' 
+                                    placeholder="Bạn đang nghĩ gì ?" 
+                                    transparent 
+                                    onChange={this.handlePostChange} 
+                                    style={{height: '100%',fontSize: 16,float: 'left',width:'90%',overflowY: 'scroll'}} 
+                                /> */}
+                                <TextArea
+                                    rows={1}
+                                    value={postText} 
+                                    type='text' 
+                                    placeholder="Bạn đang nghĩ gì ?" 
+                                    transparent 
+                                    onChange={this.handlePostChange} 
+                                    style={{height: '100%',fontSize: 16,float: 'left',overflowY: 'scroll',border: 'none', background: 'none', outline: 'none'}} 
+
+                                />
+                                
+                        
 
                             </Form.Field>
-
+                            
                         </Form.Group>
                         
-                        <Button.Group  widths={3}>
-                            <Button  >
+                        <Button.Group  size='small' widths={4}>
+                            <Button >
                             <Image style={{width:'30px'}} spaced='right' centered  src={pictureIcon} />
                          
                             <span style={{marginLeft:'10px'}}>Ảnh/Video</span>
@@ -55,8 +119,33 @@ class CreatePostModal extends React.Component{
                             <span style={{marginLeft:'10px'}}>Check in</span>
 
                             </Button>
+                            <Button  onClick={this.handleTogglePicker}>
+                            <Image style={{width:'30px'}} spaced='right' centered  src={smileIcon} />
+                         
+                            <span style={{marginLeft:'10px'}}>Cảm xúc </span>{
+                              
+                            }
+                            
+                            </Button>
+                            {emojiPicker ? (
+                                (
+                                    <div onMouseLeave={this.handleTogglePicker} className="emoji-mart-select">
+                                        <Picker 
+
+                                            i18n={{ search: 'Tìm kiếm', categories: { search: 'Tìm kiếm theo mục', recent: 'Đã sử dụng gần đây' } }}
+                                            onSelect={this.handleEmojiSelect}
+                                            set='facebook'
+                                            emoji='point_up'
+                                            style={{position: "absolute",left:'55%', top:'65%'}}
+                                    
+                                        />
+                                    </div>
+                                )
+                            ) : ''}
+                          
                            
                         </Button.Group>
+                        
 
 
                         <Form.Button  color='teal' fluid style={{marginTop: '50px'}}>Chia sẻ</Form.Button>
