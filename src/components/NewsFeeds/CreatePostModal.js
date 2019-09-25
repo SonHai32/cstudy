@@ -14,7 +14,9 @@ class CreatePostModal extends React.Component{
 
     state = {
         postText: '',
-        emojiPicker: false
+        emojiPicker: false,
+        selectionStart: 0        
+
     }
     
 
@@ -28,30 +30,76 @@ class CreatePostModal extends React.Component{
     }
 
     handleEmojiSelect = emoji =>{
+        
         const oldPost = this.state.postText;
-        const newPost = this.colonToUnicode(`${oldPost} ${emoji.colons}`)
+        const newPost = this.addEmojiToInputWithSeletionStart(oldPost,this.state.selectionStart,this.colonToUnicode(emoji.colons));
         this.setState({postText: newPost})
+        //this.colonToUnicode(`${oldPost} ${emoji.colons}`)
         
     }
-
-    colonToUnicode = message =>{
     
-        return message.replace(/:[A-Za-z0-9_+-]+:/g, x=>{
-            x = x.replace(/:/g, "");
-            
-            let emoji = emojiIndex.emojis[x];
-        
-            if(emoji !== undefined){
-                let unicode = emoji.native
-                if(unicode !== undefined){
-                    return unicode
-                }
-            }
 
-            x = ":" + x + ":"
-        })
+
+    colonToUnicode = emojiMessage =>{
+        let x = emojiMessage.replace(/:/g,"")
+        let emoji = emojiIndex.emojis[x];
+        if(emoji !== undefined){
+            let unicode = emoji.native
+            if(unicode !== undefined){
+                return unicode
+            }else{
+                return null
+            }
+        } 
+        // return message.replace(/:[A-Za-z0-9_+-]+:/g, x=>{
+        //     x = x.replace(/:/g, "");
+            
+        //     let emoji = emojiIndex.emojis[x];
+            
+
+        //     if(emoji !== undefined){
+                
+        //         let unicode = emoji.native
+            
+        //         if( unicode !== undefined){
+        //             return unicode
+        //         }else{
+        //             return ''
+        //         }
+        //     }
+
+        //     x = ":" + x + ":"
+        // })
+
     }
 
+addEmojiToInputWithSeletionStart = (post, selectionStart,emoji) =>{
+ 
+    if(post){
+        if(emoji){
+            
+            return post.substring(0,selectionStart) +emoji+ post.substring(selectionStart,post.length)
+        }else{
+            return post
+        }
+    }else{
+        if(emoji){
+            return post + emoji
+        }
+    }
+}
+
+inputClicked = event =>{
+   
+    this.setState({selectionStart: event.target.selectionStart});
+    
+}
+
+inputKeyPressed = event =>{
+    this.setState({selectionStart: event.target.selectionStart});
+    
+    
+}
     render(){
 
         const {postText,emojiPicker} = this.state;
@@ -74,24 +122,17 @@ class CreatePostModal extends React.Component{
 
                             <Form.Field  style={{width: '100%'}} >
                                 
-                                {/* <Input  
-                                
-                                    value={postText} 
-                                    type='text' 
-                                    placeholder="Bạn đang nghĩ gì ?" 
-                                    transparent 
-                                    onChange={this.handlePostChange} 
-                                    style={{height: '100%',fontSize: 16,float: 'left',width:'90%',overflowY: 'scroll'}} 
-                                /> */}
+                            
                                 <TextArea
                                     rows={1}
                                     value={postText} 
                                     type='text' 
                                     placeholder="Bạn đang nghĩ gì ?" 
                                     transparent 
+                                    onClick={this.inputClicked}
                                     onChange={this.handlePostChange} 
                                     style={{height: '100%',fontSize: 16,float: 'left',overflowY: 'scroll',border: 'none', background: 'none', outline: 'none'}} 
-
+                                    onKeyUp={this.inputKeyPressed}  
                                 />
                                 
                         
