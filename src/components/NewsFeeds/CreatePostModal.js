@@ -2,6 +2,10 @@ import React from 'react'
 import { Modal, Header,Form,Image, Button, Input, TextArea } from 'semantic-ui-react';
 import {Picker,emojiIndex} from 'emoji-mart'
 import 'emoji-mart/css/emoji-mart.css'
+import uuid from 'uuidv4'
+
+import firebase from '../../firebase'
+import FileModal from './FileModal'
 
 
 import pictureIcon from '../../Images/picture.svg'
@@ -14,9 +18,16 @@ class CreatePostModal extends React.Component{
 
     state = {
         postText: '',
+        postImages: [],
         emojiPicker: false,
-        selectionStart: 0        
-
+        selectionStart: 0,
+        fileModal: false,        
+        uploadTask: null,
+        uploadPercent: 0,
+        storeRef: firebase.storage().ref(),
+        postsRef: firebase.database().ref('posts'),
+      
+        
     }
     
 
@@ -34,7 +45,7 @@ class CreatePostModal extends React.Component{
         const oldPost = this.state.postText;
         const newPost = this.addEmojiToInputWithSeletionStart(oldPost,this.state.selectionStart,this.colonToUnicode(emoji.colons));
         this.setState({postText: newPost})
-        //this.colonToUnicode(`${oldPost} ${emoji.colons}`)
+    
         
     }
     
@@ -51,25 +62,7 @@ class CreatePostModal extends React.Component{
                 return null
             }
         } 
-        // return message.replace(/:[A-Za-z0-9_+-]+:/g, x=>{
-        //     x = x.replace(/:/g, "");
-            
-        //     let emoji = emojiIndex.emojis[x];
-            
-
-        //     if(emoji !== undefined){
-                
-        //         let unicode = emoji.native
-            
-        //         if( unicode !== undefined){
-        //             return unicode
-        //         }else{
-        //             return ''
-        //         }
-        //     }
-
-        //     x = ":" + x + ":"
-        // })
+        
 
     }
 
@@ -100,13 +93,73 @@ inputKeyPressed = event =>{
     
     
 }
+
+openFileModal = () =>{
+    this.setState({fileModal: true})
+}
+
+closeFileModal = () =>{
+    this.setState({fileModal: false})
+}
+
+uploadFile = (file,metadata) =>{
+    const filePath = this.props.user.uid+'/media/image/'+uuid()+'.jpg';
+    const uploadTask = this.state.storeRef.child(filePath).put(file,metadata);
+    this.setState({uploadTask},()=>{
+        this.state.uploadTask.on('state_changed', snap =>{
+            const uploadPercent = Math.round((snap.bytesTransferred / snap.totalBytes)*100) 
+            this.setState({uploadPercent},()=>{
+                if(this.state.uploadPercent == 100){
+                    setTimeout(()=>{
+                        this.state.uploadTask.snapshot.ref.getDownloadURL().then(downloadURL =>{
+                            const image = [];
+                            image.push({downloadURL: downloadURL, imagePath: this.state.uploadTask.location_.path})
+                            this.setState({postImages: this.state.postImages.concat(image)},()=>{
+                                console.log(this.state.postImages)
+                            })
+                        })
+                    },800 - this.state.uploadPercent)
+                }
+            })
+        });
+        
+    })
+    
+    
+}
+
+savePost = event =>{
+    event.preventDefault();
+    const postChild = this.props.user.uid+uuid()+'/post';
+    const postCreate ={
+      postChild: postChild,
+      createByUid: this.props.user.uid,
+      createByName: this.props.user.displayName,
+      avatar: this.props.user.photoURL ,
+      timestamp: Date.now(),
+      postImages: Array().concat(this.state.postImages),
+      postText: this.state.postText,
+      liked: [{username: 'null', userUID: 'null'}]
+    }
+    
+    this.state.postsRef.child(postChild).set(postCreate).then(()=>{
+        this.setState({postText: '', postImages: []});
+        this.props.closeModal()
+    })
+    
+  }
+
+
     render(){
 
         const {postText,emojiPicker} = this.state;
         const {user,modal,closeModal} = this.props;
         
         return(
-            <Modal centered size='small' open={modal} onClose={closeModal} closeIcon style={{top: '10%', transform: 'translateY(-10%)'}}>
+            <div className="wrapper">
+                <FileModal fileModal={this.state.fileModal} uploadFile={this.uploadFile} closeModal={this.closeFileModal} />
+
+                <Modal centered size='small' open={modal} onClose={closeModal} closeIcon style={{top: '10%', transform: 'translateY(-10%)'}}>
                 <Modal.Header >
                 <Header as='h3'> 
         
@@ -142,7 +195,7 @@ inputKeyPressed = event =>{
                         </Form.Group>
                         
                         <Button.Group  size='small' widths={4}>
-                            <Button >
+                            <Button  onClick={this.openFileModal}>
                             <Image style={{width:'30px'}} spaced='right' centered  src={pictureIcon} />
                          
                             <span style={{marginLeft:'10px'}}>Ảnh/Video</span>
@@ -189,11 +242,12 @@ inputKeyPressed = event =>{
                         
 
 
-                        <Form.Button  color='teal' fluid style={{marginTop: '50px'}}>Chia sẻ</Form.Button>
+                        <Form.Button onClick={this.savePost}  color='green' fluid style={{marginTop: '50px'}}>Chia sẻ</Form.Button>
 
                     </Form>
                 </Modal.Content>
             </Modal>
+            </div>
         );
     }
 }

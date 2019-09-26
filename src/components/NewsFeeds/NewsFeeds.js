@@ -23,14 +23,11 @@ class NewsFeeds extends React.Component{
       imageModalStatus: false,
       imageModalURL: '',
       postModal: false,
-      uploadTask: null,
-      uploadStatus : '',
-      percentUploaded : 0,
       imagePost: [],
       postCreate: [],
       postModal: false,
       postFromDatabase: [],
-      storeRef: firebase.storage().ref(),
+
       databaseRef: firebase.database().ref('posts'),
       imageLoading: false,
       postLoading: false,
@@ -72,14 +69,6 @@ class NewsFeeds extends React.Component{
 
 
   
-    openFileModal = () =>{
-      this.setState({fileModal: true})
-    }
-
-    closeFileModal = () =>{
-
-      this.setState({fileModal: false})
-    }
 
     openImageModal = event =>{
      
@@ -99,58 +88,7 @@ class NewsFeeds extends React.Component{
       this.setState({postModal: false})
     }
 
-    uploadFile = (file, metadata) =>{
-      const filePath = this.state.user.uid+'/media/image/'+uuid()+'.jpg'
-     
-      this.setState({
-  
-        imageLoading: true,
-        uploadTask: this.state.storeRef.child(filePath).put(file,metadata)
-      
-        },
-          () => {
-            this.state.uploadTask.on('state_changed', snap =>{
-              const percentUploaded = Math.round((snap.bytesTransferred / snap.totalBytes)*100);
-              console.log(percentUploaded)
-              this.setState({percentUploaded});
-            
-            if(percentUploaded === 100){
-              this.setState({percentUploaded: 0})
-              setTimeout(()=>{
-                this.state.uploadTask.snapshot.ref
-              .getDownloadURL()
-              .then(downloadURL => {
-                const image = {downloadURL: downloadURL, imagePath: this.state.uploadTask.location_.path}
-                this.setState({imagePost: this.state.imagePost.concat(image),imageLoading: false})
-              
-                 })
-                .catch(err=>console.log(err))
-              },1000)  
-            
-            }
-            
-            })
-          },err=>{console.log(err)}
-        )
-      }
-
-      savePost = event =>{
-        event.preventDefault();
-        const postChild = this.state.user.uid+uuid()+'/post';
-        const postCreate ={
-          postChild: postChild,
-          createByUid: this.state.user.uid,
-          createByName: this.state.user.displayName,
-          avatar: this.state.user.photoURL ,
-          timestamp: Date.now(),
-          postImages: Array().concat(this.state.imagePost),
-          postText: this.state.post,
-          liked: [{username: 'null', userUID: 'null'}]
-        }
-        
-        this.state.databaseRef.child(postChild).set(postCreate).then(()=>this.setState({post: '', imagePost: []}))
-        
-      }
+   
 
 
       
@@ -308,7 +246,7 @@ class NewsFeeds extends React.Component{
         
         <FileModal 
           fileModal={this.state.fileModal}
-          uploadFile = {this.uploadFile}
+          uploadFile = {this.uploadFile}  
           closeModal = {this.closeFileModal}
         />
         <CreatePostModal 
