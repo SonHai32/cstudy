@@ -409,7 +409,7 @@ class NewsFeeds extends React.Component{
               </Button>
             </Button.Group>
             <Divider />
-      
+                     
          
         
       </Feed>

@@ -14,7 +14,7 @@ const App = ({currentUser}) =>(
        
     <HeaderPanel />
     <Responsive minWidth={480}>
-      <SidePanelLeft currentUser={currentUser} />
+      {/* <SidePanelLeft currentUser={currentUser} /> */}
     </Responsive>
     {/* <SidePanelRight /> */}
     

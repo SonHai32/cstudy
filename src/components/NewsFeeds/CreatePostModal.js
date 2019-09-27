@@ -12,7 +12,7 @@ import pictureIcon from '../../Images/picture.svg'
 import tagFriends from '../../Images/tagfriends.svg'
 import locationIcon from '../../Images/location.svg'
 import editIcon from '../../Images/edit.svg'
-import smileIcon from '../../Images/iconsmile.svg'
+import smileIcon from '../../Images/smile.svg'
 
 class CreatePostModal extends React.Component{
 
@@ -46,7 +46,6 @@ class CreatePostModal extends React.Component{
         const newPost = this.addEmojiToInputWithSeletionStart(oldPost,this.state.selectionStart,this.colonToUnicode(emoji.colons));
         this.setState({postText: newPost})
     
-        
     }
     
 
@@ -184,7 +183,7 @@ savePost = event =>{
                                     transparent 
                                     onClick={this.inputClicked}
                                     onChange={this.handlePostChange} 
-                                    style={{height: '100%',fontSize: 16,float: 'left',overflowY: 'scroll',border: 'none', background: 'none', outline: 'none'}} 
+                                    style={{height: '100%',fontSize: 16,float: 'left',border: 'none', background: 'none', outline: 'none'}} 
                                     onKeyUp={this.inputKeyPressed}  
                                 />
                                 
@@ -194,13 +193,14 @@ savePost = event =>{
                             
                         </Form.Group>
                         
-                        <Button.Group  size='small' widths={4}>
+                        <Button.Group widths={4}  size='small' compact fluid>
                             <Button  onClick={this.openFileModal}>
                             <Image style={{width:'30px'}} spaced='right' centered  src={pictureIcon} />
                          
                             <span style={{marginLeft:'10px'}}>Ảnh/Video</span>
 
                             </Button>
+                          
                             <Button      >
                             <Image  style={{width:'30px'}} spaced='right' centered  src={tagFriends} />
                          
@@ -244,7 +244,7 @@ savePost = event =>{
 
                         <Form.Button onClick={this.savePost}  color='green' fluid style={{marginTop: '50px'}}>Chia sẻ</Form.Button>
 
-                    </Form>
+                    </Form> 
                 </Modal.Content>
             </Modal>
             </div>

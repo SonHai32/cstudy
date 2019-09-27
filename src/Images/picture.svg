@@ -1,1 +1,6 @@
-<?xml version="1.0" ?><!DOCTYPE svg  PUBLIC '-//W3C//DTD SVG 1.1//EN'  'http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd'><svg height="512px" style="enable-background:new 0 0 512 512;" version="1.1" viewBox="0 0 512 512" width="512px" xml:space="preserve" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><g id="_x31_59_x2C__Twitter_x2C__Image_x2C__Picture"><g><polygon points="40,38.999 40,468.998 215,293.998 270,348.998 360,258.998 470,358.998 470,38.999   " style="fill:#EFF3F6;"/><g><circle cx="150" cy="158.999" r="40" style="fill:#FCD884;"/></g><g><polygon points="470,358.998 470,468.998 385,468.998 385,463.998 270,348.998 360,258.998    " style="fill:#70993F;"/></g><g><polygon points="385,463.998 385,468.998 40,468.998 215,293.998 270,348.998    " style="fill:#80AF52;"/></g></g></g><g id="Layer_1"/></svg>
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M40 38.999V468.998L215 293.998L270 348.998L360 258.998L470 358.998V38.999H40Z" fill="#BDFBFF"/>
+<path d="M150 198.999C172.091 198.999 190 181.09 190 158.999C190 136.908 172.091 118.999 150 118.999C127.909 118.999 110 136.908 110 158.999C110 181.09 127.909 198.999 150 198.999Z" fill="#FBD243"/>
+<path d="M470 358.998V468.998H385V463.998L270 348.998L360 258.998L470 358.998Z" fill="#00EE7C"/>
+<path d="M385 463.998V468.998H40L215 293.998L270 348.998L385 463.998Z" fill="#00FF85"/>
+</svg>

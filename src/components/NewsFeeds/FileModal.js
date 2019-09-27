@@ -18,7 +18,7 @@ class FileModal extends React.Component{
         const {file} = this.state;
         const {uploadFile, closeModal} = this.props
 
-        if(file !== null){
+        if(file){
             if(this.isAuthorized(file.type)){
                 //send File
                 const metadata = {contentType: file.type}
@@ -55,12 +55,16 @@ class FileModal extends React.Component{
                     />
                 </Modal.Content>
                 <Modal.Actions>
-                    <Button color='green' inverted onClick={this.sendFile}>
-                        <Icon name='checkmark' />
-                    </Button>
-                    <Button color='red' inverted onClick={closeModal}>
-                        <Icon name='remove' /> Cancel
-                    </Button>
+       
+                    <Button.Group>
+                        <Button negative inverted onClick={closeModal}>
+                            <Icon name='remove' /> Cancel
+                        </Button>
+                        <Button.Or />
+                        <Button onClick={this.sendFile} inverted positive>
+                            <Icon name='checkmark' />Upload
+                        </Button>
+                    </Button.Group>
                     
                 </Modal.Actions>
             </Modal>

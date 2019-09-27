@@ -2,10 +2,6 @@
     background: #EDEDED;
 }
 
-*::-webkit-scrollbar {
-    display: none
-}
-
 .register {
     height: 965px;
     background: #eee;
