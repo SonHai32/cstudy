@@ -9,7 +9,7 @@
         "firebase": "^6.4.0",
         "js-hash-code": "^1.0.0",
         "md5": "^2.2.1",
-        "moment": "^2.24.0",
+        "moment": "^2.29.4",
         "moment-with-locales-es6": "^1.0.1",
         "react": "^16.9.0",
         "react-dom": "^16.9.0",
